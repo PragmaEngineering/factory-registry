@@ -23,8 +23,8 @@ test("external tools load with the external framework with valid member entrypoi
             path.join(
               installed.content,
               "skills",
-              "spec-and-plan",
-              "templates",
+              name === "spec.html" ? "author-spec" : "author-plan",
+              "assets",
               name,
             ),
           );
@@ -65,7 +65,7 @@ test("external tools load with the external framework with valid member entrypoi
           );
           assert.ok(
             preview.skills.some((file: string) =>
-              file.endsWith("/skills/go-implementation/SKILL.md"),
+              file.endsWith("/skills/go-code-quality/SKILL.md"),
             ),
           );
         }
@@ -476,7 +476,7 @@ test("external tools load with the external framework with valid member entrypoi
     assert.equal(overridden.runner_configuration.model, "review-model");
     assert.ok(
       overridden.skills.some((file: string) =>
-        file.endsWith("/skills/spec-and-plan/SKILL.md"),
+        file.endsWith("/skills/author-spec/SKILL.md"),
       ),
     );
     writeJSON(path.join(installed.project, "factory.json"), {

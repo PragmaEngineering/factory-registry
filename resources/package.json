@@ -1,0 +1,7 @@
+{
+  "name": "factory-agent-runtime",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test *.test.mjs ../tests/*.test.mjs" },
+  "dependencies": { "@modelcontextprotocol/sdk": "1.32.2" }
+}

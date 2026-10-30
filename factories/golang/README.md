@@ -1,34 +1,17 @@
-# Go development factory
+# Go coding factory
 
-Use for changes to Go applications and services, including existing codebases. Member names and bundle paths are defined in [factory.json](factory.json). Load members only when needed.
+[factory.json](factory.json) defines the complete Go coding workflow: architect, architecture review, human design approval, Go implementation, code review, and human acceptance. The design and implementation stages each allow up to three architect/reviewer or coder/reviewer rounds before escalating unresolved findings to the human decision. A satisfactory review reaches the same decision sooner. Human `request_changes` starts another bounded set of rounds. Review findings route back to the relevant agent through the prior-result handoff. The agents and their native Pi profiles live in [the agent library](../../agents/README.md).
 
-The user asks their existing agent to use this factory. The coordinator handles task creation, sessions, messages, and decision records using the operations reference (`$FACTORY_HOME/orchestrator/references/operations.md` in the installed framework). Users give requests, feedback, and approvals in conversation; they do not need to operate the helper scripts.
+The config belongs in the **application project root** for a run. Copy it there and change each `agents[].path` to the installed agent directory, or use [the GO-001 eval preparation script](../../../evals/factory-go/prepare-go-001.py) as an example. Paths relative to `factory.json` resolve inside the application project, so the library's own `../../agents/...` values cannot be copied unchanged. Do not run `factory exec -c` against this library file unless the library directory itself is the intended work area.
 
-## Workflow and decisions
+From the application root, run `factory exec "Your request"`, then inspect `factory ls`, `factory EXECUTION-ID`, and `factory inbox`. Answer human decisions with `factory answer REQUEST-ID OUTCOME --reason "..."`. Agents communicate through the [thread MCP runtime](../../resources/runtime-adapters.md) and submit explicit `step_result` messages. The example requires files only for its listed `outputs_on` outcomes, so a blocker can retain its cause without producing success artifacts.
 
-The [structured workflow](factory.json) is authoritative for step order, agents, expected outputs, decisions, and revision routes. It moves from specification to architecture review, human design approval, implementation, independent code review, and human acceptance. Architecture findings route back to specification; code findings or final change requests route back to implementation. The task pins this graph when created. The coordinator reads its current position with `workflow.ts status` and obtains dispatch requests with `workflow.ts request`, using the installed framework's operations reference.
+The existing agent profiles use Pi and require Pi, Node.js, working model credentials, and any enabled MCP tools on the host. The `gopls` MCP in the coder and reviewer profiles needs `gopls` on `PATH`. The local command runner is a host process, not a sandbox; only run trusted agent packages. The workflow no longer uses the old Comms task service or Ralph loop configuration. The build agent can still use its coding and checking skills within its assigned step.
 
-The architect refines the skill-owned starter documents in the task directory. Human approval is required for the current `spec.html` and `plan.html` before implementation; it is recorded with exact hashes. The coder works in the project root and uses the bounded Ralph loop configured on its member. Lint and tests are coder tools, not separate agent steps. Reviewers independently examine the actual work and return `changes_requested` with concrete findings when revision is needed. A submitted result does not itself complete the task; final human acceptance follows the code review. Stop and surface unresolved questions or repeated disagreement rather than treating another iteration as automatic success.
+The agents use the shared [planning document contract](../../resources/planning/document-contract.md): author-spec/author-plan for the architect, review-spec/review-plan for architecture review, and follow-plan for the coder. The [registry guide](../../README.md#software-planning-skills-and-documents) links the matching HTML templates and completed examples. These skills do not introduce another approval sequence; the decisions above remain defined by this factory's configuration.
 
-## Tools and project context
+## Agent execution quality
 
-First inspect the repository's own instructions, build configuration, Go version, module layout, and existing tests. Do not replace working conventions just to match this example. Record the starting state and files changed so independent review can distinguish task work from pre-existing changes. Git diffs may help when available; Git is not required.
+The design agents use Go planning evidence on demand for consequential API, version, and concurrency claims. Spec and plan stay proportional to the change and use the content-only HTML helper. First reviews establish independent coverage; later rounds revisit actual changes, open findings, and affected contracts before a final consistency check. Reviewer findings retain their IDs across rounds.
 
-Typical tools are `gofmt`, `go test`, `go vet`, and `golangci-lint`. Prefer the project's existing Make targets and lint configuration. The Go coder's optional `/path/to/tools/agents/coder_golang/scripts/check-go.sh` checks formatting, runs tests, and invokes golangci-lint using the project's configuration; agree on the checks first. Never install or upgrade the Go toolchain or other dependencies without authorization.
-
-The Go coder and reviewer bundles enable gopls in their own `pi/mcp.json`. Install it and confirm `command -v gopls` succeeds in the same environment that starts Factory; `go install` commonly places it in `$(go env GOPATH)/bin`, which may not be on `PATH`. The factory's `make install` and `make update` fail with that path when the command is unreachable. Startup checks connect without installing it. If the team intentionally runs without gopls, disable the `gopls` entry in those agent profiles and record the limitation. Other MCPs are declared in each agent profile. Record which tools were actually available and used, not merely listed in a skill.
-
-The architect and both reviewers declare an optional official Linear MCP connection in their own profiles and link the shared context skill. The connection is disabled by default; enable it in the relevant agent profile when the task asks for ticket context. Its default endpoint exposes read tools only; retrieving a ticket does not authorize commenting, assigning it, or changing its status. Record the source and flag conflicts with the task's approved documents.
-
-Only the coder edits application source during this flow. Reviewers can write their task review documents and run agreed checks; neither instruction nor the supplied Pi tool list enforces filesystem isolation.
-
-## Dependencies
-
-From the application root:
-
-```bash
-make -C /path/to/tools/factories/golang install
-make -C /path/to/tools/factories/golang update
-```
-
-Installs the shared coordinator tools plus golangci-lint, gopls, and the coder's pinned Ralph extension. Run `update` only when intending to upgrade host tools. Set `FACTORY_HOME` to the separate framework checkout before running these targets. Docker with Compose, credentials, and model configuration remain separate setup. See dependency setup (`$FACTORY_HOME/docs/troubleshooting.md#dependency-commands` in the installed framework).
+Launchers preflight local commands before model startup. Install `rg`, `go`, `gofmt`, `golangci-lint`, and `gopls` for the Go bundles. `GOTOOLCHAIN` defaults to `local`, avoiding automatic toolchain downloads; provision a compatible version in advance. See [runtime adapters](../../resources/runtime-adapters.md) for managed Pi tool exposure and prerequisites. These changes leave workflow routing, loop limits, and human approvals in the factory configuration.

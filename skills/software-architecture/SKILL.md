@@ -12,8 +12,6 @@ Inspect the current system and constraints. Identify the actual decision, the af
 
 Compare practical approaches, including extending the current design. Explain the responsibilities, data ownership, interfaces, dependencies, failure behavior, and operational work each adds. Recommend an approach with explicit costs and tradeoffs, and state what new evidence would change it. Separate observed behavior, assumptions, and proposals.
 
-Put the behavior and quality expectations in `spec.html`; put the approach, material alternatives, risks, and verification in `plan.html`. A separate architecture report or decision-record file is not required. Leave review and approval to the factory's designated participants.
-
 Read [design decisions](references/design-decisions.md) when comparing structures, coordinating state, or planning an incremental change. Read [diagrams](references/diagrams.md) when a visual would clarify boundaries or runtime behavior. Resolve these links against this skill's source directory, not an assembled session file.
 
 Use the [domain-modeling skill](../domain-modeling/SKILL.md) when the decision depends on business semantics. Avoid prescribing microservices, queues, caches, or architecture patterns without a demonstrated need.

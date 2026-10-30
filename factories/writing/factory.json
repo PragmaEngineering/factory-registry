@@ -5,12 +5,14 @@
     {
       "name": "pair_writer",
       "path": "../../agents/pair_writer",
-      "entrypoint": "start.sh"
+      "entrypoint": "start.sh",
+      "args": ["-p", "{prompt}"]
     },
     {
       "name": "architecture_reviewer",
       "path": "../../agents/architecture_reviewer",
-      "entrypoint": "start.sh"
+      "entrypoint": "start.sh",
+      "args": ["-p", "{prompt}"]
     }
   ],
   "recipe": "README.md",
@@ -18,7 +20,7 @@
     "start": "draft",
     "steps": [
       {
-        "id": "draft",
+        "name": "draft",
         "type": "agent",
         "agent": "pair_writer",
         "title": "Develop working draft",
@@ -37,7 +39,7 @@
         }
       },
       {
-        "id": "feedback",
+        "name": "feedback",
         "type": "decision",
         "actor": "human",
         "artifacts": [],

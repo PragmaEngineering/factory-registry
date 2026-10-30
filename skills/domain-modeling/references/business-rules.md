@@ -21,7 +21,7 @@ An aggregate is a candidate boundary for state that must be validated and commit
 
 Keep the boundary as small as the actual invariant permits. Consider contention, concurrent changes, loading cost, and which operations require the whole state. Do not split required atomic behavior merely to obtain smaller types; do not combine unrelated state merely because one workflow touches it.
 
-State how enforcement survives concurrent requests. An in-memory existence check alone does not establish global uniqueness. Depending on the rule and storage system, a database constraint, transaction, conditional write, or another concurrency mechanism may be needed. The plan must describe the chosen mechanism and how conflicting attempts behave.
+State how enforcement survives concurrent requests. An in-memory existence check alone does not establish global uniqueness. Depending on the rule and storage system, a database constraint, transaction, conditional write, or another concurrency mechanism may be needed. Explain the chosen mechanism and how conflicting attempts behave.
 
 Some operations legitimately involve several consistency boundaries. If temporary inconsistency is acceptable, name the intermediate states, time expectations, and reconciliation or recovery behavior. If it is not acceptable, state the actual atomicity requirement before proposing asynchronous integration.
 
@@ -29,6 +29,6 @@ Some operations legitimately involve several consistency boundaries. If temporar
 
 For example, a reservation request may need to reject a second confirmation, preserve capacity under concurrent requests, or distinguish expiry from cancellation. Those are different rules. Confirm which ones the task actually requires rather than importing them as a generic reservation model.
 
-Capture relevant scenarios in the spec: initial state, actor or input, expected transition, and observable result. Include repeated, invalid, or concurrent operations only where they threaten the agreed behavior. Map the implementation approach and meaningful tests to those scenarios in the plan.
+Describe relevant scenarios with an initial state, actor or input, expected transition, and observable result. Include repeated, invalid, or concurrent operations where they threaten the agreed business rule. Identify meaningful checks for those scenarios; the assignment determines where to record the analysis.
 
 For Go, express the selected concepts idiomatically using packages, structs, functions, and small interfaces. Avoid translating an object-oriented pattern hierarchy literally. A simpler procedural approach is acceptable when it preserves the rules more clearly.

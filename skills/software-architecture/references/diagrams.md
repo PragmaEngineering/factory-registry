@@ -12,6 +12,6 @@ A sequence or flow diagram can explain a request, state transition, failure path
 
 Label arrows with the interaction or data they represent. Show ownership or trust boundaries when relevant, and identify which component is authoritative for important state. Avoid unlabeled lines and boxes named only after technologies.
 
-For self-contained `spec.html` and `plan.html`, use embedded SVG with a readable title and description, or a simple accessible HTML/CSS diagram. Provide nearby text explaining the important relationship. Do not add a CDN or runtime diagram library merely to render a document. If diagram source is included for editing, ensure the visible document still works without an external renderer.
+For planning document exports, use the shared [document contract](../../../resources/planning/document-contract.md) for offline rendering and accessibility requirements.
 
 Use [arc42's overview](https://arc42.org/overview/) to check whether relevant context, constraints, runtime behavior, decisions, quality needs, and risks are explained. Select useful topics; do not impose its whole document structure on every task. These are external references, not bundled templates or diagrams.

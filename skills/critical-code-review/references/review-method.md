@@ -4,7 +4,7 @@
 
 Read the request and acceptance criteria, then inspect the implementation paths and tests that should satisfy them. Use the coder's changed-file list and recorded baseline, plus available diffs, snapshots, or direct source inspection. Do not attribute unrelated existing defects to the change. If the baseline is uncertain, state that limitation and avoid inventing an exact change history.
 
-Assess the implementation first; then use the coder's explanation to resolve specific uncertainties. Separate a defect in implementation, a flaw in the approved design, and a newly proposed feature. Important behavior outside the written criteria can still expose a regression or security defect, but speculation about additional features does not silently expand the approved task.
+Assess the implementation first; then use the coder's explanation to resolve specific uncertainties. Separate a defect in implementation, a flaw in the applicable design, and a newly proposed feature. Important behavior outside the written criteria can still expose a regression or security defect, but speculation about additional features does not silently expand the assigned task.
 
 ## Challenge claims with concrete scenarios
 
@@ -36,14 +36,14 @@ Start with a recommendation: ready, changes_requested, or blocked, with a short 
 1. Scope reviewed and acceptance coverage, including relevant paths not examined.
 2. Findings with stable IDs such as `CR-001`, classification, severity, blocking status, source location, triggering scenario, impact, and requested resolution or question.
 3. Actual commands, results, and verification limitations. Link task evidence rather than dumping excessive terminal output.
-4. Remaining decisions for the coordinator and any useful nonblocking suggestions.
+4. Remaining decisions for the assigned caller and any useful nonblocking suggestions.
 
 Do not require a prose compliment or a minimum number of issues. Summarize sound aspects only when that helps explain the assessment. Avoid a blanket approval when important behavior remains unexamined.
 
 ## Resolve findings
 
-Send actionable findings to the coder and the verdict to the coordinator. For each response, inspect the repair or counterevidence and mark the finding resolved, still open, or withdrawn. Withdraw an incorrect finding plainly. Keep its ID so the next round can follow the reasoning.
+Return actionable findings and the readiness assessment through the assigned review artifact or handoff. For each response, inspect the repair or counterevidence and mark the finding resolved, still open, or withdrawn. Withdraw an incorrect finding plainly. Keep its ID so the next round can follow the reasoning.
 
 Request a focused reproduction or regression test when it would settle a material dispute. Do not repair source, remove an assertion, or install a different toolchain yourself. If an experiment needs changes, use an isolated scratch copy and describe it honestly. Do not run destructive or external probes without authorization.
 
-After the factory's bounded review rounds, return unresolved disagreements to the coordinator. More rounds require a reason and the agreed authority. Do not invent a fresh criterion after all original concerns have been answered.
+Report unresolved disagreements through the assigned handoff. The caller owns whether to request another review. Do not invent a fresh criterion after all original concerns have been answered.

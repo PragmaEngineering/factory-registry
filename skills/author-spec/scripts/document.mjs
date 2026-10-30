@@ -1,0 +1,1 @@
+../../../resources/planning/document-tool.mjs

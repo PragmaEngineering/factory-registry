@@ -6,7 +6,9 @@ license: MIT
 
 # Go code quality
 
-Use the project's instructions, supported Go version, and existing conventions. In coding mode, implement the agreed change; in review mode, inspect and report without repairing source. These instructions do not grant permission to install tools or expand the task.
+Read the project instructions, `go.mod`, relevant packages, and tests before editing or reviewing. Respect the project's Go version and dependency strategy. Avoid broad upgrades, global toolchain changes, generated binaries in source, and unrelated restructuring. Use small interfaces near their consumer and give goroutines an explicit lifecycle.
+
+In coding mode, implement the agreed change; in review mode, inspect and report without repairing source. These instructions do not grant permission to install tools or expand the task.
 
 Use gofmt and existing lint configuration for mechanical checks. Judge names, package cohesion, control flow, and interfaces by whether they make the behavior easier to understand. Avoid arbitrary function-size rules, blanket wrappers, and abstractions without a real consumer.
 

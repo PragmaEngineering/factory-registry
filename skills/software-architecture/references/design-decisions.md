@@ -47,4 +47,4 @@ Choose consistency based on the business rule. Eventual consistency requires def
 
 For an existing system, describe the smallest useful increment and the ordering constraints. Include data migration, coexistence with old clients, or recovery from a failed rollout when the task requires them. Preserve unrelated behavior and human changes.
 
-Record significant decisions in `plan.html` with context, alternatives, rationale, consequences, and open questions. Identify a test, observation, or focused experiment that would challenge a critical assumption. The architect proposes verification; the assigned implementation and review roles carry it out according to the factory agreement.
+Identify a test, observation, or focused experiment that would challenge a critical assumption. Return the decision, evidence, and uncertainty to the assigned artifact; document layout and execution policy are outside this reasoning method.
