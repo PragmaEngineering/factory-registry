@@ -1,8 +1,8 @@
 # Task readiness
 
-A small Jev classification package for new-task admission. It asks whether a task provides enough context for meaningful progress, then returns its **original JSON request and validated JSON response**. It does not write a spec, generate questions for the user, apply confidence thresholds or make a workflow routing decision.
+A small Jev classification package for new-task admission. It asks whether a task provides enough context for meaningful progress, then returns its **original JSON request and validated JSON response**. It does not write a spec or generate questions for the user. An optional admission policy maps validated answers to outcomes; Factory owns their configured routes.
 
-`completed` means the provider call returned valid answers. `readiness: clarify` is still a successful evaluation. A consuming LLM uses the call context to ask a targeted question or proceed. Provider failures, missing credentials, malformed answers and size violations exit nonzero without submitting a successful result; Factory exposes the failed attempt and configured recovery policy.
+`admission: null` (the bundle default) is advisory: `completed` means the provider call returned valid answers, including `readiness: clarify`. With admission configured, the package returns `admitted` or `review_required`. A valid assessment is never confused with a provider failure. Provider failures, missing credentials, malformed answers and size violations exit nonzero without submitting a successful result; Factory exposes the failed attempt and configured recovery policy.
 
 ## Files
 
@@ -22,13 +22,14 @@ Defaults use OpenRouter's Decisions endpoint and `typesafe/jev-1.14`. Only the O
 ```json
 {
   "name": "readiness",
-  "path": "/path/to/registry/classifications/task-readiness",
+  "path": "/path/to/registry/classifiers/task-readiness",
   "entrypoint": "start.sh",
   "with": {
     "provider": "openrouter",
     "endpoint": "https://openrouter.ai/api/alpha/decisions",
     "model": "typesafe/jev-1.14",
-    "api_key_env": "OPENROUTER_API_KEY"
+    "api_key_env": "OPENROUTER_API_KEY",
+    "admission": {"minimum_probability": 0.85}
   }
 }
 ```
@@ -60,7 +61,22 @@ Its accepted result has:
 
 The shown bodies are abbreviated, not actual predictions. Runtime data retains every returned body field, including answer probabilities, model metadata and usage. Bodies are preserved as JSON values, not original whitespace or HTTP bytes. Headers and credentials are excluded. The result is sent to the discovered controller participant using MCP and must receive `effect.state: accepted`.
 
-Bind later step inputs to outputs named `request` and `response`. No additional feedback envelope, prose template or probability threshold is required. See the [complete factory example](../../factories/readiness/factory.json).
+Bind later step inputs to outputs named `request` and `response`. The original bodies remain unchanged in either mode; no feedback envelope or prose template is added. See the [complete factory example](../../factories/readiness/factory.json).
+
+## Enforced admission
+
+Set `with.admission` to `{"minimum_probability":0.85}` to enforce readiness. The number is the returned **probability of the `accept` label**, not the separate `confidence` statistic. Any finite threshold from 0 to 1 is valid configuration. The example's 0.85 is an initial policy, not an empirically validated guarantee.
+
+| Valid assessment | Result outcome |
+|---|---|
+| Selected label is `accept` and its probability meets the threshold | `admitted` |
+| `clarify`, `pass_through`, or an `accept` below the threshold | `review_required` |
+
+In the readiness factory, `admitted` routes to architecture. `review_required` routes to the **human admission decision**. Nothing starts the architect until the operator approves; rejection stops the workflow. An approval is an explicit, recorded override of the automated gate. Include missing context in the decision reason so the architect receives it through accepted history.
+
+This does not rerun Jev against the operator's reason or silently treat uncertainty as a pass. To reassess amended input rather than override the gate, reject this execution and submit a new one with that input. Provider errors and invalid answers remain failed attempts; they do not route through human admission as valid assessments.
+
+Omit `admission`, or set it to `null`, for advisory `completed` behavior. The workflow's outcome routes must match its selected mode.
 
 ## Operational limits
 

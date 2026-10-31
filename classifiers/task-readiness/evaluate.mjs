@@ -1,5 +1,5 @@
-// Bounded request construction and validation. No workflow routing, thresholds,
-// feedback rewriting, agent framework or provider credentials are embedded here.
+// Bounded request construction and validation. Optional admission policy maps
+// validated answers to outcomes; Factory owns the configured workflow routes.
 import { readFile, stat, open } from 'node:fs/promises';
 import { isAbsolute } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -30,6 +30,12 @@ export async function configuration(overrides = {}) {
   for (const name of ['timeout_ms', 'max_request_bytes', 'max_response_bytes']) {
     const limit = name === 'timeout_ms' ? 120000 : 24000;
     if (!integer(config[name]) || config[name] < 1 || config[name] > limit) throw new Error(`${name} must be between 1 and ${limit}`);
+  }
+  if (config.admission !== null) {
+    const policy = config.admission;
+    if (!object(policy) || Object.keys(policy).some(key => key !== 'minimum_probability') || !probability(policy.minimum_probability)) {
+      throw new Error('admission must be null or an object with minimum_probability between 0 and 1');
+    }
   }
   return config;
 }
@@ -137,4 +143,23 @@ export function usageEvent(response) {
   };
   if (typeof usage.cost === 'number' && Number.isFinite(usage.cost) && usage.cost >= 0) event.cost_usd = usage.cost;
   return event;
+}
+
+// This policy is code, not an LLM interpretation. All non-admitted valid
+// answers require an explicit operator decision; transport errors never enter it.
+export function admissionResult(response, config) {
+  if (config.admission === null) return {
+    outcome: 'completed',
+    summary: 'Task readiness evaluated; consume the original request and response as fallible assessment data.',
+  };
+  const answer = response.answers.readiness;
+  const threshold = config.admission.minimum_probability;
+  if (answer.choice === 'accept' && answer.probabilities.accept >= threshold) return {
+    outcome: 'admitted',
+    summary: `Admission granted: readiness accept probability ${answer.probabilities.accept} meets ${threshold}.`,
+  };
+  return {
+    outcome: 'review_required',
+    summary: `Admission withheld: readiness ${answer.choice}, accept probability ${answer.probabilities.accept}, required ${threshold}. Operator approval is required before downstream work.`,
+  };
 }

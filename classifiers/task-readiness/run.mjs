@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
-import { configuration, buildRequest, validateResponse, evaluate, usageEvent } from './evaluate.mjs';
+import { configuration, buildRequest, validateResponse, evaluate, usageEvent, admissionResult } from './evaluate.mjs';
 import { withController } from '../../resources/result-client.mjs';
 
 async function main() {
@@ -26,7 +26,7 @@ async function main() {
     }
     const metric = usageEvent(data.response);
     if (metric) console.log(JSON.stringify(metric));
-    await submit({ outcome: 'completed', summary: 'Task readiness evaluated; consume the original request and response as fallible assessment data.', data });
+    await submit({ ...admissionResult(data.response, config), data });
     console.log('Task readiness evaluation accepted by controller.');
   });
 }

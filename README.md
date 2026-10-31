@@ -67,4 +67,4 @@ These tests create temporary repositories and commits; they do not commit change
 
 ## Classification packages
 
-[classifications/](classifications/README.md) contains bounded decision-model bundles, separate from agents. Start with [task readiness](classifications/task-readiness/README.md) and its [readiness → planning factory](factories/readiness/README.md). The classifier returns its original Jev request/response; the planning agent consumes both through explicit Factory input bindings. Credentials and native agent configuration remain package-specific.
+[classifiers/](classifiers/README.md) contains bounded decision-model bundles, separate from agents. Start with [task readiness](classifiers/task-readiness/README.md) and its [readiness → planning factory](factories/readiness/README.md). The classifier returns its original Jev request/response; the planning agent consumes both through explicit Factory input bindings. The readiness example enforces an admission threshold and requires explicit operator approval for other valid assessments before planning starts. Credentials and native agent configuration remain package-specific.

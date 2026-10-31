@@ -10,9 +10,9 @@ import { createServer } from 'node:http';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
-import { configuration, buildRequest, evaluate, validateResponse, usageEvent } from '../classifications/task-readiness/evaluate.mjs';
+import { configuration, buildRequest, evaluate, validateResponse, usageEvent, admissionResult } from '../classifiers/task-readiness/evaluate.mjs';
 
-const questions = JSON.parse(await readFile(new URL('../classifications/task-readiness/questions.json', import.meta.url), 'utf8'));
+const questions = JSON.parse(await readFile(new URL('../classifiers/task-readiness/questions.json', import.meta.url), 'utf8'));
 function response() {
   return {
     model: 'typesafe/jev-1.14-snapshot', provider: 'TypeSafe',
@@ -112,7 +112,7 @@ test('standalone classifier submits through MCP and reuses its saved evaluation 
   await writeFile(configPath, JSON.stringify({ endpoint: `${origin}/decisions` }));
   async function run(invocation) {
     await mkdir(invocation, { recursive: true });
-    const child = spawn(fileURLToPath(new URL('../classifications/task-readiness/start.sh', import.meta.url)), [], {
+    const child = spawn(fileURLToPath(new URL('../classifiers/task-readiness/start.sh', import.meta.url)), [], {
       cwd: directory, env: { ...process.env, OPENROUTER_API_KEY: 'fixture-provider-secret', FACTORY_MCP_URL: `${origin}/mcp`, FACTORY_MCP_TOKEN: 'fixture-mcp-secret', FACTORY_THREAD_ID: 'thread', FACTORY_PARTICIPANT_ID: 'classifier', FACTORY_INPUTS_PATH: inputPath, FACTORY_PACKAGE_CONFIG: configPath, FACTORY_INVOCATION_DIR: invocation },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -131,6 +131,31 @@ test('standalone classifier submits through MCP and reuses its saved evaluation 
   const recovered = await run(invocation); assert.equal(recovered.code, 0, recovered.stderr); assert.equal(providerCalls, 1);
   assert.equal(submitted[0].operation_id, submitted[1].operation_id);
   assert.deepEqual(submitted[0].payload, submitted[1].payload);
+  await writeFile(configPath, JSON.stringify({ endpoint: `${origin}/decisions`, admission: { minimum_probability: 0.85 } }));
+  const gated = await run(join(directory, 'try-gated')); assert.equal(gated.code, 0, gated.stderr);
+  assert.equal(submitted.at(-1).payload.parts[0].data.outcome, 'review_required');
+  assert.deepEqual(submitted.at(-1).payload.parts[0].data.data.response, response());
   providerStatus = 401;
-  const failed = await run(join(directory, 'try-2')); assert.equal(failed.code, 1); assert.match(failed.stderr, /HTTP 401/); assert.equal(submitted.length, 2);
+  const failed = await run(join(directory, 'try-2')); assert.equal(failed.code, 1); assert.match(failed.stderr, /HTTP 401/); assert.equal(submitted.length, 3);
+});
+
+test('enforced admission only admits accept at or above the configured probability', async () => {
+  const config = await configuration({ admission: { minimum_probability: 0.85 } });
+  const answer = response();
+  for (const [choice, accept, clarify, passThrough, expected] of [
+    ['accept', 0.85, 0.1, 0.05, 'admitted'],
+    ['accept', 0.84, 0.1, 0.06, 'review_required'],
+    ['clarify', 0.12, 0.85, 0.03, 'review_required'],
+    ['pass_through', 0.01, 0.01, 0.98, 'review_required'],
+    ['accept', 0.34, 0.33, 0.33, 'review_required'],
+  ]) {
+    answer.answers.readiness = { type: 'choice', choice, probabilities: { accept, clarify, pass_through: passThrough }, confidence: 0.5 };
+    validateResponse(answer, questions);
+    assert.equal(admissionResult(answer, config).outcome, expected);
+  }
+  const advisory = await configuration();
+  assert.equal(admissionResult(response(), advisory).outcome, 'completed');
+  for (const admission of [{}, { minimum_probability: -0.1 }, { minimum_probability: 1.1 }, { minimum_probability: '0.85' }, { minimum_probability: 0.85, bypass: true }]) {
+    await assert.rejects(configuration({ admission }), /admission/);
+  }
 });
