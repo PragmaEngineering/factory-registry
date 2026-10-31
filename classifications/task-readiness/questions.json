@@ -1,0 +1,29 @@
+{
+  "task_type": {
+    "type": "choice",
+    "instructions": "Classify the main user intent using the supplied task context.",
+    "criteria": {
+      "investigation": "Diagnose, explain, or establish evidence about a behavior",
+      "implementation": "Create, change, or refactor code",
+      "follow_up": "Continue or adjust a task already in progress",
+      "other": "Question, discussion, or request outside code execution"
+    }
+  },
+  "readiness": {
+    "type": "choice",
+    "instructions": "Can a coding agent make meaningful progress now? A short request is not automatically ambiguous. Do not demand a root cause, exact code locations, or other details the agent can discover. Use clarify only when a consequential objective, target, or constraint is missing.",
+    "criteria": {
+      "accept": "Task has a usable objective and starting point; discovery is allowed",
+      "clarify": "A specific missing objective, target, or constraint prevents meaningful progress",
+      "pass_through": "Normal follow-up, discussion, or question that should not be blocked"
+    }
+  },
+  "missing_target": {
+    "type": "noul",
+    "instructions": "Is the request missing the observable symptom, affected behavior, or question needed to identify what to investigate?",
+    "criteria": {
+      "true": "The intended target or observable behavior cannot be identified from the supplied context",
+      "false": "The supplied context provides a usable target, or this is not an investigation"
+    }
+  }
+}

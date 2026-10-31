@@ -52,3 +52,19 @@ See the [Go factory guide](factories/golang/README.md) for its workflow and the 
 The bundled Pi profiles currently default to OpenRouter. Provide the configured provider credential through the environment; never put API keys in `factory.json`. Enabled MCPs and extensions may require additional host tools. The local Factory command runner executes agents with the host user's permissions, so use trusted bundles.
 
 The older `tests/*.ts` integration checks target the previous TypeScript coordinator and Comms implementation; they do not verify the current Go controller. Run `npm ci --prefix resources` before the standalone checks above; the runtime integration test binds a loopback port and uses official MCP SDK clients. Use Factory Workflows' Go tests for the controller and [Factory Go eval](../evals/factory-go/README.md) for an end-to-end coding eval.
+
+## Optional Git lifecycle skills
+
+[Git work branch](skills/git-work-branch/SKILL.md) and [Git commit](skills/git-commit/SKILL.md) are shared skills with deterministic Python utilities. Configure them as execution and stage hooks in a project's `factory.json`; the controller invokes the scripts without relying on an agent to remember lifecycle commands. Use an execution after hook to release the checkout reservation.
+
+The committer generates a configured Conventional Commit subject and execution/multi-agent identity trailers without a model. It requires explicit commit paths, preserves repository hooks/signing, detects duplicate effects, and never publishes changes. Preparation requires a clean checkout and an existing commit. These optional utilities require Python 3.9+ and Git on a Unix host. Read the [Controls hook contract](../controls/docs/hooks.md) before enabling them. Agent bundles can link these canonical skills when Git guidance is useful; no skills are copied into agents automatically.
+
+```sh
+node --test tests/git-hooks.test.mjs
+```
+
+These tests create temporary repositories and commits; they do not commit changes in this Registry checkout.
+
+## Classification packages
+
+[classifications/](classifications/README.md) contains bounded decision-model bundles, separate from agents. Start with [task readiness](classifications/task-readiness/README.md) and its [readiness → planning factory](factories/readiness/README.md). The classifier returns its original Jev request/response; the planning agent consumes both through explicit Factory input bindings. Credentials and native agent configuration remain package-specific.

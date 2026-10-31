@@ -12,7 +12,7 @@ import { z } from 'zod';
 
 const moduleURL = file => pathToFileURL(join(import.meta.dirname, 'node_modules/@modelcontextprotocol/sdk/dist/esm', file)).href;
 
-async function runSession(t, scenario) {
+async function runSession(t, scenario, options = {}) {
   const root = mkdtempSync(join(tmpdir(), 'factory-pi-mcp-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const messages = [];
@@ -69,8 +69,11 @@ for await (const line of createInterface({input:process.stdin})) {
 }
 await client.close();
 `, { mode: 0o700 });
-  const child = spawn(process.execPath, [join(import.meta.dirname, 'pi-rpc-session.mjs'), '-p', 'initial work'], {
-    env: { ...process.env, AGENT_EXECUTABLE: fake, PI_CODING_AGENT_DIR: profile, FACTORY_MCP_URL: url, FACTORY_MCP_TOKEN: 'test-secret', FACTORY_THREAD_ID: 'thread', FACTORY_PARTICIPANT_ID: 'worker', FACTORY_COMMS_SKILL: root, FACTORY_PI_CONTINUATION_LIMIT: scenario === 'no-recovery' ? '0' : '2' },
+  const promptPath = join(root, 'prompt.md');
+  writeFileSync(promptPath, 'initial work');
+  const args = options.promptFile ? [] : ['-p', 'initial work'];
+  const child = spawn(process.execPath, [join(import.meta.dirname, 'pi-rpc-session.mjs'), ...args], {
+    env: { ...process.env, ...(options.promptFile ? { FACTORY_PROMPT_PATH: promptPath } : {}), AGENT_EXECUTABLE: fake, PI_CODING_AGENT_DIR: profile, FACTORY_MCP_URL: url, FACTORY_MCP_TOKEN: 'test-secret', FACTORY_THREAD_ID: 'thread', FACTORY_PARTICIPANT_ID: 'worker', FACTORY_COMMS_SKILL: root, FACTORY_PI_CONTINUATION_LIMIT: scenario === 'no-recovery' ? '0' : '2' },
     stdio: ['pipe', 'pipe', 'pipe'],
   });
   t.after(() => child.kill('SIGKILL'));
@@ -141,3 +144,5 @@ for (const [scenario, description] of Object.entries({
 })) {
   test(description, { timeout: 15000 }, t => runSession(t, scenario));
 }
+
+test("managed Pi package reads its Factory prompt file without Pi-specific factory arguments", async t => { await runSession(t, "recover", { promptFile: true }); });

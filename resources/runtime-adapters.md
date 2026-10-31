@@ -53,3 +53,13 @@ Each launcher checks its executable, `rg`, and enabled stdio MCP commands before
 Go launchers default `GOTOOLCHAIN=local` to prevent implicit toolchain downloads. A deliberate user setting is preserved. Pi profiles omit its `find` tool, which requires an additional `fd` executable; use `rg --files` for file discovery.
 
 In managed Pi sessions, `list_participants`, `send_message`, and `read_messages` use native **direct** exposure, so the model calls their schemas without writing a codemode script. Other Factory tools remain available through codemode; the background-delivery wait tool stays hidden. This is a Pi presentation choice. The MCP protocol and shared communication skill remain runner independent; another adapter can expose the same schemas through its runner's native tools.
+
+## Resource telemetry
+
+The Pi RPC adapter emits `factory.telemetry.v1` records alongside retained native output. `telemetry.mjs` translates completed assistant usage into separate input, cache-read, cache-write, and output categories; it also reports tool start/end and settled progress. Streaming usage snapshots are excluded. Missing or zero-filled Pi pricing remains unknown.
+
+Other runners may emit the same versioned, newline-delimited protocol without depending on Pi. The control plane owns persistence, display, and per-attempt budget enforcement. See [resource metrics and the adapter contract](../../controls/docs/resources.md). Agent completion and collaboration still use MCP, independently of resource reporting.
+
+## Generic package inputs
+
+The Go controller supports `packages`, `type: "run"`, package-specific `with`, and named `input_bindings`. It supplies private JSON files through `FACTORY_INPUTS_PATH` and `FACTORY_PACKAGE_CONFIG`; an LLM assignment at `FACTORY_PROMPT_PATH` also contains the bound JSON. The Pi adapter reads that prompt file when no explicit `-p` was supplied. Classification bundles use the same MCP completion contract and need no Pi runtime. See [package bindings](../../controls/docs/packages.md).

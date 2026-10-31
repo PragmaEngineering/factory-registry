@@ -2,6 +2,7 @@
 // Native Pi RPC supervision plus MCP delivery. Domain skills do not implement
 // workflow routing; this adapter only configures the connection and moves input.
 import { spawn } from 'node:child_process';
+import { telemetry } from './telemetry.mjs';
 import { createInterface } from 'node:readline';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -17,6 +18,7 @@ try {
 }
 
 const argv = process.argv.slice(2);
+if (!argv.includes('-p') && process.env.FACTORY_PROMPT_PATH) argv.push('-p', readFileSync(process.env.FACTORY_PROMPT_PATH, 'utf8'));
 const promptFlag = argv.indexOf('-p');
 if (promptFlag < 0 || promptFlag + 1 >= argv.length || !process.env.FACTORY_MCP_URL || !process.env.FACTORY_MCP_TOKEN) {
   console.error('Factory Pi adapter requires -p PROMPT and a provisioned MCP connection');
@@ -66,6 +68,7 @@ const failSession = reason => {
   console.error(`Factory agent blocked: ${reason}`);
   child.kill('SIGTERM');
 };
+let telemetrySequence = 0;
 let buffer = Buffer.alloc(0);
 let nextID = 0;
 const pending = new Map();
@@ -88,6 +91,8 @@ child.stdout.on('data', chunk => {
     process.stdout.write(line);
     try {
       const record = JSON.parse(line.toString('utf8'));
+      const metric = telemetry(record);
+      if (metric) process.stdout.write(JSON.stringify({ type: 'factory.telemetry.v1', sequence: ++telemetrySequence, ...metric }) + '\n');
       if (record.type === 'response' && record.command === 'prompt' && pending.has(record.id)) {
         const waiter = pending.get(record.id); pending.delete(record.id);
         if (record.success === false) waiter.reject(new Error(record.error || 'Pi rejected input')); else waiter.resolve();

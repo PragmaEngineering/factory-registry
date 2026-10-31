@@ -32,3 +32,5 @@ To customize a bundle, add or remove symlinks under its `skills/` directory. Kee
 Conventional commits and Linear context remain optional library skills. Link them into an agent only when needed; neither is a required planning or review phase. Linear runner configuration is documented in [Linear integration](../resources/integrations/linear.md).
 
 Both design agents include the on-demand [Go planning evidence skill](../skills/go-planning-evidence/SKILL.md). Other languages keep the generic planning method. Author skills render content-only HTML bodies with the shared document helper; review skills use the same helper to read content without CSS.
+
+Managed packages may omit Pi-specific `args`: when `-p` is absent, the Pi adapter reads the assignment from `FACTORY_PROMPT_PATH`. That assignment includes explicitly bound structured inputs. This does not change standalone `start.sh -p "..."` usage or native provider/model configuration.
