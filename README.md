@@ -38,7 +38,7 @@ The standalone checks verify generated artifacts, references, example criterion 
 
 ## Use the Go coding factory
 
-Keep Factory Workflows and this repository outside the application. Place a complete `factory.json` in the application root. Start from [the Go factory definition](factories/golang/factory.json), then change `packages[].path` to paths for this checkout's agents and classifiers. A library-relative path such as `../../agents/architect` does not remain valid when copied into another project. `factory.json` has no `extends` mechanism.
+Keep Factory Workflows and this repository outside the application. Place a complete `factory.json` in the application root. Start from [the Go factory definition](factories/golang/factory.json), then change `packages[].path` and all hook script arguments to paths for this checkout's agents, classifiers, and Git utilities. This factory now requires a clean Git checkout with an initial commit; it creates an execution branch and commits after each approved stage. See [its Git lifecycle](factories/golang/README.md#execution-branch) before starting it. A library-relative path such as `../../agents/architect` does not remain valid when copied into another project. `factory.json` has no `extends` mechanism.
 
 From the application root:
 
@@ -57,7 +57,7 @@ The bundled Pi profiles currently default to OpenRouter. Provide the configured 
 
 ## Optional Git lifecycle skills
 
-[Git work branch](skills/git-work-branch/SKILL.md) and [Git commit](skills/git-commit/SKILL.md) are shared skills with deterministic Python utilities. Configure them as execution and stage hooks in a project's `factory.json`; the controller invokes the scripts without relying on an agent to remember lifecycle commands. Use an execution after hook to release the checkout reservation.
+The deterministic Git hook utilities live in [scripts/](scripts/): [branch preparation/release](scripts/git-work-branch.py) and [commits](scripts/git-commit.py). The [Git work branch](skills/git-work-branch/SKILL.md) and [Git commit](skills/git-commit/SKILL.md) skills document their use; the utilities do not depend on loading either skill. Configure them as execution and stage hooks in a project's `factory.json`; the controller invokes the scripts without relying on an agent to remember lifecycle commands. Use an execution after hook to release the checkout reservation.
 
 The committer generates a configured Conventional Commit subject and execution/multi-agent identity trailers without a model. It requires explicit commit paths, preserves repository hooks/signing, detects duplicate effects, and never publishes changes. Preparation requires a clean checkout and an existing commit. These optional utilities require Python 3.9+ and Git on a Unix host. Read the [Controls hook contract](../controls/docs/hooks.md) before enabling them. Agent bundles can link these canonical skills when Git guidance is useful; no skills are copied into agents automatically.
 

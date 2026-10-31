@@ -5,10 +5,10 @@ description: Prepare and verify an execution work branch using the shared Git ho
 
 # Execution work branch
 
-Use [scripts/prepare.py](scripts/prepare.py) as an execution `before` hook. The controller invokes it deterministically; agents do not need to invoke it again.
+Use [branch utility](../../scripts/git-work-branch.py) as an execution `before` hook. The controller invokes it deterministically; agents do not need to invoke it again.
 
 ```json
-{"name":"work-branch","command":"python3","arguments":["/path/to/registry/skills/git-work-branch/scripts/prepare.py","--base","HEAD","--prefix","execution/"]}
+{"name":"work-branch","command":"python3","arguments":["/path/to/registry/scripts/git-work-branch.py","--base","HEAD","--prefix","execution/"]}
 ```
 
 The script reads version 1 hook context from stdin. It requires a clean, non-bare checkout and creates `<prefix><execution_id>` from the selected base. It records ownership and the starting commit under Git's common directory, outside tracked project files. Repeating the same invocation verifies its branch and returns the receipt; it never resets work. Unowned existing branches, another active execution on the checkout, or unexpected branch changes fail visibly. A completed prior execution may leave a clean checkout that can start another branch.

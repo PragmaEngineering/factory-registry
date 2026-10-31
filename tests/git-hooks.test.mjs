@@ -6,8 +6,8 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-const prepare=fileURLToPath(new URL('../skills/git-work-branch/scripts/prepare.py',import.meta.url));
-const commit=fileURLToPath(new URL('../skills/git-commit/scripts/commit.py',import.meta.url));
+const prepare=fileURLToPath(new URL('../scripts/git-work-branch.py',import.meta.url));
+const commit=fileURLToPath(new URL('../scripts/git-commit.py',import.meta.url));
 function fixture(t) {
  const cwd=mkdtempSync(join(tmpdir(),'registry-git-'));t.after(()=>rmSync(cwd,{recursive:true,force:true}));
  const env={...process.env,GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_NOSYSTEM:'1'};

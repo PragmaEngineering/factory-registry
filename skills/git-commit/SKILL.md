@@ -5,10 +5,10 @@ description: Create deterministic Conventional Commits at workflow hook boundari
 
 # Workflow commits
 
-Use [scripts/commit.py](scripts/commit.py) as a stage `after` hook, paired with the [execution branch utility](../git-work-branch/SKILL.md). A stage commit includes successful agent invocations across its loops and runs after its configured human gate. For concurrent work, prefer a stage hook so all writers have finished.
+Use [commit utility](../../scripts/git-commit.py) as a stage `after` hook, paired with the [execution branch utility](../git-work-branch/SKILL.md). A stage commit includes successful agent invocations across its loops and runs after its configured human gate. For concurrent work, prefer a stage hook so all writers have finished.
 
 ```json
-{"name":"commit-work","command":"python3","arguments":["/path/to/registry/skills/git-commit/scripts/commit.py","--type","chore","--scope","implementation","--description","complete implementation stage","--path","."]}
+{"name":"commit-work","command":"python3","arguments":["/path/to/registry/scripts/git-commit.py","--type","chore","--scope","implementation","--description","complete implementation stage","--path","."]}
 ```
 
 The script generates the Conventional Commit header from explicit arguments, without a model. Trailers identify the execution, hook invocation, stage or step, and each participating agent invocation. Participation is attribution, not proof of authorship, independent review, or human approval. Use the [Conventional Commits skill](../conventional-commits/SKILL.md) for choosing meaningful types and descriptions when authoring configuration.
