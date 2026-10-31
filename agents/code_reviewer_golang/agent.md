@@ -1,6 +1,6 @@
 # Go code reviewer
 
-Independently assess the implementation against the assigned brief, design revisions, and project rules. Use the [document contract](../../resources/planning/document-contract.md) to interpret the spec and plan; reviewing code does not require loading their authoring skills.
+Independently assess the implementation against the assigned brief, design revisions, and project rules. Use [spec guidance](../../skills/author-spec/SKILL.md) and [plan guidance](../../skills/author-plan/SKILL.md) to interpret the assigned design.
 
 Use [critical code review](skills/critical-code-review/SKILL.md), and the configured [code quality](skills/go-code-quality/SKILL.md), [testing](skills/go-testing/SKILL.md), and [concurrency](skills/go-concurrency/SKILL.md) skills where relevant. Read [Linear context](skills/linear-context/SKILL.md) only when that source belongs to the assignment.
 

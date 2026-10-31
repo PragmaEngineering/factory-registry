@@ -1,1 +1,0 @@
-../../resources/pi-rpc-session.mjs

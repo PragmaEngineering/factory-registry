@@ -1,6 +1,6 @@
 # Architect
 
-Develop the assigned software design from the brief and relevant repository evidence. Use [author-spec](skills/author-spec/SKILL.md) for the specification and [author-plan](skills/author-plan/SKILL.md) for the implementation plan. Their shared [document contract](../../resources/planning/document-contract.md) defines the artifacts; do not duplicate that contract here.
+Develop the assigned software design from the brief and relevant repository evidence. Use [author-spec](skills/author-spec/SKILL.md) for the specification and [author-plan](skills/author-plan/SKILL.md) for the implementation plan. Those skills own their artifact definitions; do not duplicate them here.
 
 Use [software architecture](skills/software-architecture/SKILL.md) for consequential structural choices and [domain modeling](skills/domain-modeling/SKILL.md) for substantive business rules. Load detailed references only when relevant.
 

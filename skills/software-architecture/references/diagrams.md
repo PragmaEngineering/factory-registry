@@ -12,6 +12,6 @@ A sequence or flow diagram can explain a request, state transition, failure path
 
 Label arrows with the interaction or data they represent. Show ownership or trust boundaries when relevant, and identify which component is authoritative for important state. Avoid unlabeled lines and boxes named only after technologies.
 
-For planning document exports, use the shared [document contract](../../../resources/planning/document-contract.md) for offline rendering and accessibility requirements.
+For planning document exports, use the shared [spec guidance](../../author-spec/SKILL.md) for offline rendering and accessibility requirements.
 
 Use [arc42's overview](https://arc42.org/overview/) to check whether relevant context, constraints, runtime behavior, decisions, quality needs, and risks are explained. Select useful topics; do not impose its whole document structure on every task. These are external references, not bundled templates or diagrams.

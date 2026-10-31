@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1630" viewBox="0 0 1800 1630" role="img" aria-labelledby="title description">
+<title id="title">Go coding factory: admission, design, implementation, and human acceptance</title>
+<desc id="description">The task-readiness classifier admits an accepted task at probability 0.85 or higher; other valid assessments require a human admission override. Design runs architect and architecture reviewer sequentially for up to three rounds per visit, followed by human design approval. Implementation runs Go coder and code reviewer sequentially for up to three rounds per visit, followed by human acceptance. Human change requests start another bounded visit. Rejection or execution failure blocks the run.</desc>
+<defs>
+  <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.7" fill="#d5dde8" opacity="0.55"/></pattern>
+  <linearGradient id="paper" x2="0" y2="1"><stop stop-color="#f8fafc"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>
+  <linearGradient id="agentfill" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#f2faf9"/></linearGradient>
+  <filter id="shadow" x="-15%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#193047" flood-opacity="0.07"/></filter>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#657b90" stroke-width="1.5"/></marker>
+  <marker id="teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#087e83" stroke-width="1.5"/></marker>
+  <marker id="red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#a65b63" stroke-width="1.5"/></marker>
+</defs>
+<style>
+text {font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;fill:#182b3f}
+.mono {font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+.small {font-size:18px;fill:#5b6d80}.label {font-size:18px;letter-spacing:2px;font-weight:600}.title {font-size:27px;font-weight:600}
+.route {font-size:18px;fill:#4b6479}.node {fill:url(#agentfill);stroke:#c9d9df;stroke-width:1.4;filter:url(#shadow)}
+.line {fill:none;stroke:#657b90;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;marker-end:url(#arrow)}
+.return {fill:none;stroke:#087e83;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;marker-end:url(#teal)}
+.reject {fill:none;stroke:#a65b63;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+</style>
+<rect width="1800" height="1630" fill="url(#paper)"/>
+<rect width="1800" height="1630" fill="url(#grid)"/>
+<rect x="64" y="62" width="48" height="5" rx="2" fill="#087e83"/>
+<text x="64" y="103" class="label">PRAGMA / WORKFLOW LIBRARY</text>
+<text x="61" y="170" font-size="62" font-weight="600" letter-spacing="-2">The Go coding factory</text>
+<text x="65" y="212" font-size="24" fill="#5b6d80">Admission controls, bounded review loops, and explicit human decisions.</text>
+<text x="1560" y="155" font-size="82" font-weight="600" fill="#087e83" opacity="0.11">GO</text>
+
+<text x="65" y="268" class="label">00 / ADMISSION</text>
+<rect x="64" y="300" width="240" height="148" rx="15" class="node" style="fill:#ffffff"/>
+<rect x="65" y="321" width="4" height="106" rx="2" fill="#66778c"/>
+<text x="88" y="330" class="label" style="fill:#66778c">INPUT</text>
+<text x="88" y="366" class="title">Task context</text>
+<text x="88" y="396" class="mono small">brief + documents</text>
+<text x="88" y="426" class="small">captured execution input</text>
+<rect x="380" y="300" width="390" height="148" rx="15" class="node" style="fill:#f6faff"/>
+<rect x="381" y="321" width="4" height="106" rx="2" fill="#3569a0"/>
+<text x="404" y="330" class="label" style="fill:#3569a0">CLASSIFIER</text>
+<text x="404" y="366" class="title">Task readiness</text>
+<text x="404" y="396" class="mono small">check-readiness</text>
+<text x="404" y="426" class="small">Jev · minimum p(accept) 0.85</text>
+<rect x="1000" y="300" width="350" height="148" rx="15" class="node" style="fill:#fcfaff"/>
+<rect x="1001" y="321" width="4" height="106" rx="2" fill="#805da9"/>
+<text x="1024" y="330" class="label" style="fill:#805da9">OPERATOR</text>
+<text x="1024" y="366" class="title">Admission override</text>
+<text x="1024" y="396" class="mono small">admission-review</text>
+<text x="1024" y="426" class="small">explicit recorded decision</text>
+<path d="M 304 374 H 380" class="line" />
+<path d="M 770 374 H 1000" class="line" />
+<text x="793" y="357" class="route">review_required</text>
+<text x="602" y="480" class="route" style="fill:#087e83">admitted</text>
+<path d="M 1175 448 V 490 H 575" class="return" />
+<text x="1200" y="478" class="route" style="fill:#087e83">approve</text>
+<path d="M 1350 374 H 1714 V 1440" class="reject" marker-end="url(#red)"/>
+<text x="1415" y="357" class="route" style="fill:#a65b63">reject</text>
+<rect x="64" y="570" width="1592" height="390" rx="22" fill="#ffffff" stroke="#d7e0e9" stroke-width="1.3"/>
+<text x="88" y="612" class="mono" font-size="23" style="fill:#087e83">01</text>
+<text x="132" y="612" class="title">Design</text>
+<text x="430" y="611" class="label" style="fill:#6a7b8c">SEQUENTIAL LOOP</text>
+<text x="1270" y="611" class="label" style="fill:#805da9">HUMAN DECISION</text>
+<path d="M 1150 642 V 920" stroke="#e1e7ee" stroke-width="1.4"/>
+<rect x="120" y="692" width="400" height="148" rx="15" class="node" style="fill:url(#agentfill)"/>
+<rect x="121" y="713" width="4" height="106" rx="2" fill="#087e83"/>
+<text x="144" y="722" class="label" style="fill:#087e83">AGENT</text>
+<text x="144" y="758" class="title">Architect</text>
+<text x="144" y="788" class="mono small">specification</text>
+<text x="144" y="818" class="small">spec.html + plan.html</text>
+<rect x="660" y="692" width="400" height="148" rx="15" class="node" style="fill:url(#agentfill)"/>
+<rect x="661" y="713" width="4" height="106" rx="2" fill="#087e83"/>
+<text x="684" y="722" class="label" style="fill:#087e83">AGENT</text>
+<text x="684" y="758" class="title">Architecture reviewer</text>
+<text x="684" y="788" class="mono small">architecture_review</text>
+<text x="684" y="818" class="small">reviews/architecture.md</text>
+<rect x="1220" y="692" width="350" height="148" rx="15" class="node" style="fill:#fcfaff"/>
+<rect x="1221" y="713" width="4" height="106" rx="2" fill="#805da9"/>
+<text x="1244" y="722" class="label" style="fill:#805da9">OPERATOR</text>
+<text x="1244" y="758" class="title">Design approval</text>
+<text x="1244" y="788" class="mono small">design_approval</text>
+<text x="1244" y="818" class="small">approve · changes · reject</text>
+<path d="M 520 766 H 660" class="line" />
+<text x="544" y="753" class="route">handoff</text>
+<path d="M 1060 766 H 1220" class="line" />
+<text x="1080" y="751" class="route">completed</text>
+<path d="M 860 692 V 661 H 320 V 692" class="return" />
+<text x="427" y="650" class="route" style="fill:#087e83">changes_requested · up to 3 rounds</text>
+<path d="M 1395 840 V 885 H 320 V 840" class="return" />
+<text x="560" y="874" class="route" style="fill:#087e83">request_changes · another bounded visit</text>
+<text x="120" y="928" class="small">Loop limit reached → human decision with unresolved findings.</text>
+<text x="1640" y="999" class="route">approve</text>
+<path d="M 1570 796 H 1714" class="reject" />
+<text x="1587" y="822" class="route" style="fill:#a65b63">reject</text>
+<rect x="64" y="1000" width="1592" height="390" rx="22" fill="#ffffff" stroke="#d7e0e9" stroke-width="1.3"/>
+<text x="88" y="1042" class="mono" font-size="23" style="fill:#087e83">02</text>
+<text x="132" y="1042" class="title">Implementation</text>
+<text x="430" y="1041" class="label" style="fill:#6a7b8c">SEQUENTIAL LOOP</text>
+<text x="1270" y="1041" class="label" style="fill:#805da9">HUMAN DECISION</text>
+<path d="M 1150 1072 V 1350" stroke="#e1e7ee" stroke-width="1.4"/>
+<rect x="120" y="1122" width="400" height="148" rx="15" class="node" style="fill:url(#agentfill)"/>
+<rect x="121" y="1143" width="4" height="106" rx="2" fill="#087e83"/>
+<text x="144" y="1152" class="label" style="fill:#087e83">AGENT</text>
+<text x="144" y="1188" class="title">Go coder</text>
+<text x="144" y="1218" class="mono small">build</text>
+<text x="144" y="1248" class="small">source + reviews/build.md</text>
+<rect x="660" y="1122" width="400" height="148" rx="15" class="node" style="fill:url(#agentfill)"/>
+<rect x="661" y="1143" width="4" height="106" rx="2" fill="#087e83"/>
+<text x="684" y="1152" class="label" style="fill:#087e83">AGENT</text>
+<text x="684" y="1188" class="title">Go code reviewer</text>
+<text x="684" y="1218" class="mono small">code_review</text>
+<text x="684" y="1248" class="small">reviews/code.md</text>
+<rect x="1220" y="1122" width="350" height="148" rx="15" class="node" style="fill:#fcfaff"/>
+<rect x="1221" y="1143" width="4" height="106" rx="2" fill="#805da9"/>
+<text x="1244" y="1152" class="label" style="fill:#805da9">OPERATOR</text>
+<text x="1244" y="1188" class="title">Final acceptance</text>
+<text x="1244" y="1218" class="mono small">acceptance</text>
+<text x="1244" y="1248" class="small">approve · changes · reject</text>
+<path d="M 520 1196 H 660" class="line" />
+<text x="544" y="1183" class="route">handoff</text>
+<path d="M 1060 1196 H 1220" class="line" />
+<text x="1080" y="1181" class="route">completed</text>
+<path d="M 860 1122 V 1091 H 320 V 1122" class="return" />
+<text x="427" y="1080" class="route" style="fill:#087e83">changes_requested · up to 3 rounds</text>
+<path d="M 1395 1270 V 1315 H 320 V 1270" class="return" />
+<text x="560" y="1304" class="route" style="fill:#087e83">request_changes · another bounded visit</text>
+<text x="120" y="1358" class="small">Loop limit reached → human decision with unresolved findings.</text>
+<path d="M 575 448 V 490 H 40 V 766 H 120" class="return" />
+<path d="M 1570 766 H 1620 V 982 H 40 V 1196 H 120" class="line" />
+<path d="M 1395 1270 V 1440" class="return" />
+<text x="1418" y="1420" class="route" style="fill:#087e83">approve</text>
+<path d="M 1570 1196 H 1714" class="reject" />
+<text x="1587" y="1223" class="route" style="fill:#a65b63">reject</text>
+<rect x="1220" y="1440" width="350" height="64" rx="32" fill="#e1f1eb" stroke="#bbdccc"/>
+<text x="1307" y="1482" class="title" style="fill:#23694f">Completed</text>
+<rect x="1580" y="1440" width="164" height="64" rx="32" fill="#faecee" stroke="#e3c7cc"/>
+<text x="1612" y="1481" font-size="24" style="fill:#904c59">Blocked</text>
+<text x="65" y="1472" class="small">accept must be selected and meet the threshold; other valid verdicts require admission review.</text>
+<text x="65" y="1501" class="small">Human decisions sit outside the loops. Execution failures block progress and retain diagnostics.</text>
+<path d="M 64 1532 H 1744" stroke="#ced9e2"/>
+<text x="65" y="1573" class="mono small">SOURCE  registry/factories/golang/factory.json</text>
+<text x="1165" y="1573" class="mono small">CONFIG 7386359fee1a  /  NOT A LIVE RUN</text>
+</svg>

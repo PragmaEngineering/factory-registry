@@ -2,7 +2,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { configuration, buildRequest, validateResponse, evaluate, usageEvent, admissionResult } from './evaluate.mjs';
-import { withController } from '../../resources/result-client.mjs';
+import { withController } from '@pragma/controls-sdk/result-client';
 
 async function main() {
   for (const name of ['FACTORY_INPUTS_PATH', 'FACTORY_PACKAGE_CONFIG', 'FACTORY_INVOCATION_DIR', 'FACTORY_MCP_URL', 'FACTORY_MCP_TOKEN', 'FACTORY_THREAD_ID', 'FACTORY_PARTICIPANT_ID']) {

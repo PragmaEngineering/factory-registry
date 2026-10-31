@@ -1,1 +1,1 @@
-../../../resources/planning/document-tool.mjs
+../../author-spec/scripts/document.mjs

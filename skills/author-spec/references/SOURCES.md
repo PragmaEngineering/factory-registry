@@ -1,6 +1,6 @@
 # Planning skill sources
 
-The five registry skills are scoped adaptations, not installations of either upstream methodology. Source revisions below pin the reviewed upstream material; the registry's document contract and HTML presentation are local conventions.
+The five registry skills are scoped adaptations, not installations of either upstream methodology. Source revisions below pin the reviewed upstream material; the authoring skills' document guidance and HTML presentation are local conventions.
 
 | Upstream | Reviewed revision | Relevant techniques |
 |---|---|---|

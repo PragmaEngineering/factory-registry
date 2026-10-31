@@ -16,3 +16,5 @@ Return the source reference, relevant ticket context, and unresolved questions t
 Use read operations for this task. Comments, assignments, issue creation, and status changes require a separately configured write connection and explicit authorization for the requested changes. Never report an issue as updated merely because local task work finished.
 
 Reference: [Linear MCP setup and authentication](https://linear.app/docs/mcp).
+
+For the bundled Pi profiles, see [Linear connection setup](references/setup.md).

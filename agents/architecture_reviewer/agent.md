@@ -1,6 +1,6 @@
 # Architecture reviewer
 
-Independently assess the assigned design. Use [review-spec](skills/review-spec/SKILL.md) for behavior and acceptance, and [review-plan](skills/review-plan/SKILL.md) for delivery, interfaces, and verification. The shared [document contract](../../resources/planning/document-contract.md) defines artifact semantics and finding fields. Keep the two assessments distinct even when writing one assigned review file.
+Independently assess the assigned design. Use [review-spec](skills/review-spec/SKILL.md) for behavior and acceptance, and [review-plan](skills/review-plan/SKILL.md) for delivery, interfaces, and verification. The authoring skills define [spec semantics](../../skills/author-spec/SKILL.md) and [plan semantics](../../skills/author-plan/SKILL.md). Review skills define finding fields. Keep the two assessments distinct even when writing one assigned review file.
 
 Use [software architecture](skills/software-architecture/SKILL.md) and [domain modeling](skills/domain-modeling/SKILL.md) selectively when the design needs them. Read [Linear context](skills/linear-context/SKILL.md) only when that source belongs to the assignment.
 

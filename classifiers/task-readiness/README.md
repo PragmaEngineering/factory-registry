@@ -36,10 +36,11 @@ Defaults use OpenRouter's Decisions endpoint and `typesafe/jev-1.14`. Only the O
 
 The credential value must exist in the **Factory service's environment**, not just a later client terminal. `with` contains its variable name, never the secret. Native model/provider configuration for the downstream planning agent is independent of this classifier's configuration.
 
-Requires Node.js 22+ and the Registry MCP dependency:
+Requires Node.js 22+ and the Controls SDK dependency, installed through Registry. The Go binary installer does not install these npm dependencies. With sibling Controls and Registry checkouts:
 
 ```sh
-npm ci --prefix /path/to/registry/resources
+npm ci --prefix /path/to/controls
+npm ci --prefix /path/to/registry
 ```
 
 ## Inputs and outputs
@@ -61,7 +62,7 @@ Its accepted result has:
 
 The shown bodies are abbreviated, not actual predictions. Runtime data retains every returned body field, including answer probabilities, model metadata and usage. Bodies are preserved as JSON values, not original whitespace or HTTP bytes. Headers and credentials are excluded. The result is sent to the discovered controller participant using MCP and must receive `effect.state: accepted`.
 
-Bind later step inputs to outputs named `request` and `response`. The original bodies remain unchanged in either mode; no feedback envelope or prose template is added. See the [complete factory example](../../factories/readiness/factory.json).
+Bind later step inputs to outputs named `request` and `response`. The original bodies remain unchanged in either mode; no feedback envelope or prose template is added. See the [complete factory example](../../factories/golang/factory.json).
 
 ## Enforced admission
 
@@ -72,7 +73,7 @@ Set `with.admission` to `{"minimum_probability":0.85}` to enforce readiness. The
 | Selected label is `accept` and its probability meets the threshold | `admitted` |
 | `clarify`, `pass_through`, or an `accept` below the threshold | `review_required` |
 
-In the readiness factory, `admitted` routes to architecture. `review_required` routes to the **human admission decision**. Nothing starts the architect until the operator approves; rejection stops the workflow. An approval is an explicit, recorded override of the automated gate. Include missing context in the decision reason so the architect receives it through accepted history.
+In the Go coding factory, `admitted` routes to specification. `review_required` routes to the **human admission decision**. Nothing starts the architect until the operator approves; rejection stops the workflow. An approval is an explicit, recorded override of the automated gate. Include missing context in the decision reason so the architect receives it through accepted history.
 
 This does not rerun Jev against the operator's reason or silently treat uncertainty as a pass. To reassess amended input rather than override the gate, reject this execution and submit a new one with that input. Provider errors and invalid answers remain failed attempts; they do not route through human admission as valid assessments.
 
@@ -90,7 +91,7 @@ Tests use local fake provider and MCP servers, not a live model:
 
 ```sh
 cd /path/to/registry
-node --test resources/task-readiness.test.mjs
+node --test tests/task-readiness.test.mjs
 ```
 
 API references: [OpenRouter Decisions](https://openrouter.ai/docs/api/api-reference/alphadecisions/submit-a-decisions-request), [Jev model](https://openrouter.ai/typesafe/jev-1.14), [TypeSafe confidence](https://docs.typesafe.ai/confidence). Versioned model selection does not make semantic judgments deterministic or establish their accuracy.

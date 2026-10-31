@@ -1,6 +1,6 @@
 # Linear with Pi
 
-The optional [Linear context skill](../../skills/linear-context/SKILL.md) describes sourcing and interpreting ticket context. It does not configure a connection.
+The optional [Linear context skill](../SKILL.md) describes sourcing and interpreting ticket context. It does not configure a connection.
 
 1. Link that skill into the chosen agent's `skills/` directory if it is not already selected.
 2. In that bundle's `pi/mcp.json`, enable the `linear` server. The starter profiles on the architecture and Go code reviewers use `https://mcp.linear.app/mcp/readonly` with an `Authorization: Bearer ${LINEAR_API_KEY}` header.

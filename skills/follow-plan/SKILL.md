@@ -6,7 +6,7 @@ license: MIT
 
 # Follow a software plan
 
-Read the [document contract](../../resources/planning/document-contract.md), the assignment's spec and plan revisions, applicable project instructions, prior findings, and current progress. Confirm any decision the assignment actually requires; do not introduce an approval requirement of your own. Missing or contradictory design information is a question to resolve, not permission to invent requirements.
+Read the [spec guidance](../author-spec/SKILL.md) and [plan guidance](../author-plan/SKILL.md), the assignment's spec and plan revisions, applicable project instructions, prior findings, and current progress. Confirm any decision the assignment actually requires; do not introduce an approval requirement of your own. Missing or contradictory design information is a question to resolve, not permission to invent requirements.
 
 Inspect the current source before editing and preserve unrelated work. Implement the assigned items in dependency order using the relevant language and project skills. Acknowledge changed document revisions or material scope differences before acting on them. Do not amend design documents to match your implementation without an explicit document-authoring assignment.
 
@@ -16,6 +16,6 @@ For each review finding, verify its trigger and evidence before repairing it. Re
 
 Finish with a factual handoff and evidence. Completion means the assigned work is ready for the next configured action, not that the entire execution is approved. Commits, tool installation, other agents, review scheduling, retries, and deployment require their own authorization or workflow configuration.
 
-Adaptation sources and notices: [planning sources](../../resources/planning/SOURCES.md).
+Adaptation sources and notices: [planning sources](../author-spec/references/SOURCES.md).
 
-Read HTML document content with the [document helper](../../resources/planning/document-tool.mjs) rather than repeatedly loading style markup. Keep a compact record of current revisions, assigned items, open findings, and evidence. Search for relevant symbols, read bounded sections, and implement coherent items before repeating broad checks. Preserve useful check output (command, outcome, counts, failing excerpt); expand it when diagnosing a failure. Communicate milestones, concrete questions, and consolidated handoffs rather than routine tool narration.
+Read HTML document content with the [document helper](../author-spec/scripts/document.mjs) rather than repeatedly loading style markup. Keep a compact record of current revisions, assigned items, open findings, and evidence. Search for relevant symbols, read bounded sections, and implement coherent items before repeating broad checks. Preserve useful check output (command, outcome, counts, failing excerpt); expand it when diagnosing a failure. Communicate milestones, concrete questions, and consolidated handoffs rather than routine tool narration.

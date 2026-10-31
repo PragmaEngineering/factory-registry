@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
-const documents = ['skills/author-spec/assets/spec.html', 'skills/author-plan/assets/plan.html', ...['small', 'service'].flatMap(example => ['spec', 'plan'].map(kind => `resources/planning/examples/${example}/${kind}.html`))];
+const documents = ['skills/author-spec/assets/spec.html', 'skills/author-plan/assets/plan.html', ...['small', 'service'].flatMap(example => ['spec', 'plan'].map(kind => `skills/author-${kind}/examples/${example}/${kind}.html`))];
 
 function files(directory, suffix) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
@@ -18,9 +18,9 @@ function files(directory, suffix) {
 }
 
 test('generated templates and examples match their shared sources', () => {
-  const result = spawnSync(process.execPath, ['resources/planning/build-templates.mjs', '--check'], { cwd: root, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, ['skills/author-spec/scripts/build-templates.mjs', '--check'], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
-  const styles = read('resources/planning/document.css').trimEnd();
+  const styles = read('skills/author-spec/assets/document.css').trimEnd();
   for (const file of documents) assert.ok(read(file).includes(`<style>\n${styles}\n</style>`), file);
 });
 
@@ -36,14 +36,14 @@ test('documents have unique anchors, navigable sections, accessible tables, and 
     for (const [, label] of html.matchAll(/<th scope="([^"]+)"/g)) assert.equal(label, 'col');
     const sections = [...html.matchAll(/<section id="([^"]+)"/g)].map(match => match[1]);
     for (const id of sections) assert.ok(html.includes(`href="#${id}"`), `${file}: unlinked section ${id}`);
-    const sibling = /href="(spec|plan)\.html"/.exec(html);
+    const sibling = /href="([^"#]*(?:spec|plan)\.html)"/.exec(html);
     assert.ok(sibling, file);
-    assert.ok(fs.existsSync(path.join(path.dirname(path.join(root, file)), `${sibling[1]}.html`)) || file.startsWith('skills/'), file);
+    assert.ok(fs.existsSync(path.join(path.dirname(path.join(root, file)), sibling[1])) || file.startsWith('skills/'), file);
   }
 });
 
 test('shared references and agent role links resolve from their source locations', () => {
-  const markdown = [path.join(root, 'README.md'), path.join(root, 'agents/README.md'), ...files(path.join(root, 'resources/planning'), '.md'), ...files(path.join(root, 'skills'), '.md'), ...['architect', 'architecture_reviewer', 'coder_golang', 'code_reviewer_golang', 'pair_writer'].map(name => path.join(root, 'agents', name, 'agent.md'))];
+  const markdown = [path.join(root, 'README.md'), path.join(root, 'agents/README.md'), ...files(path.join(root, 'skills'), '.md'), ...['architect', 'architecture_reviewer', 'coder_golang', 'code_reviewer_golang', 'pair_writer'].map(name => path.join(root, 'agents', name, 'agent.md'))];
   for (const file of markdown) {
     for (const [, target] of fs.readFileSync(file, 'utf8').matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
       if (/^https?:|^#/.test(target)) continue;
@@ -54,8 +54,8 @@ test('shared references and agent role links resolve from their source locations
 
 test('example acceptance references in plans resolve to their spec criteria', () => {
   for (const example of ['small', 'service']) {
-    const spec = read(`resources/planning/examples/${example}/spec.html`);
-    const plan = read(`resources/planning/examples/${example}/plan.html`);
+    const spec = read(`skills/author-spec/examples/${example}/spec.html`);
+    const plan = read(`skills/author-plan/examples/${example}/plan.html`);
     const criteria = new Set(spec.match(/AC-\d{3}/g));
     for (const id of plan.match(/AC-\d{3}/g)) assert.ok(criteria.has(id), `${example}: unknown ${id}`);
   }

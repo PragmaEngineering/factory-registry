@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { checkTools, findCommand } from './preflight.mjs';
+import { checkTools, findCommand } from '../agents/scripts/preflight.mjs';
 
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'agent tools '));
@@ -41,7 +41,7 @@ test('preflight checks enabled MCP command environments and ignores disabled and
 test('CLI fails before launching an agent when prerequisites are missing', t => {
   const { root, tool } = fixture(t);
   const pi = tool('pi');
-  const result = spawnSync(process.execPath, [join(import.meta.dirname, 'preflight.mjs'), '--agent', pi, '--require', 'missing-command'], { env: { PATH: root }, encoding: 'utf8' });
+  const result = spawnSync(process.execPath, [join(import.meta.dirname, '../agents/scripts/preflight.mjs'), '--agent', pi, '--require', 'missing-command'], { env: { PATH: root }, encoding: 'utf8' });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /required command: missing-command/);
   assert.match(result.stderr, /No tools were downloaded/);
