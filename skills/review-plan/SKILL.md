@@ -21,3 +21,7 @@ For content-only reading, use the [document helper](../author-spec/scripts/docum
 ## Findings and revisions
 
 Use the [finding fields and revision method](../review-spec/SKILL.md#findings-and-revisions) for consistent IDs, evidence, severity, and resolution tracking. Review plan feasibility and acceptance coverage independently of the author's summary. On later rounds, inspect actual changes and affected contracts before the final spec/plan consistency check.
+
+## Execution file locations
+
+When the assignment supplies an execution files directory, resolve workflow documents and review/progress artifacts there. Project source remains in the launcher-selected workspace. Use the assigned absolute paths for renderer inputs/outputs; relative Factory publication names are relative to the execution files directory, not the source checkout. Standalone assignments without this context retain their explicit/default document paths.

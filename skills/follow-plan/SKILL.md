@@ -19,3 +19,7 @@ Finish with a factual handoff and evidence. Completion means the assigned work i
 Adaptation sources and notices: [planning sources](../author-spec/references/SOURCES.md).
 
 Read HTML document content with the [document helper](../author-spec/scripts/document.mjs) rather than repeatedly loading style markup. Keep a compact record of current revisions, assigned items, open findings, and evidence. Search for relevant symbols, read bounded sections, and implement coherent items before repeating broad checks. Preserve useful check output (command, outcome, counts, failing excerpt); expand it when diagnosing a failure. Communicate milestones, concrete questions, and consolidated handoffs rather than routine tool narration.
+
+## Execution file locations
+
+When the assignment supplies an execution files directory, resolve workflow documents and review/progress artifacts there. Project source remains in the launcher-selected workspace. Use the assigned absolute paths for renderer inputs/outputs; relative Factory publication names are relative to the execution files directory, not the source checkout. Standalone assignments without this context retain their explicit/default document paths.

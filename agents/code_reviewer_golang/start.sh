@@ -1,9 +1,18 @@
 #!/bin/sh
 # Standalone Pi entrypoint. The caller owns the working directory and native configuration.
 set -eu
+# The caller may select a workspace; remaining arguments belong to Pi.
+if [ "${1:-}" = "--workspace" ]; then
+  [ "$#" -ge 2 ] && [ -n "$2" ] || { echo "--workspace requires a directory" >&2; exit 1; }
+  workspace=$(CDPATH= cd -- "$2" && pwd -P)
+  shift 2
+else
+  workspace=$PWD
+fi
 : "${GOTOOLCHAIN:=local}"
 export GOTOOLCHAIN
 agent_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+cd -- "$workspace"
 if [ -n "${AGENT_INSTRUCTIONS_FILE:-}" ]; then
   # A caller supplied the complete instruction/skill selection.
   test -f "$AGENT_INSTRUCTIONS_FILE" || { echo "Agent instructions file not found: $AGENT_INSTRUCTIONS_FILE" >&2; exit 1; }

@@ -72,3 +72,7 @@ Use technical tables, contracts, examples, and short decision rationales. Add di
 Outputs work offline: embedded CSS and SVG, semantic headings and table headers, SVG titles/descriptions, escaped literal text/code, and no scripts, external fonts, CDNs, or remote images. Explain status through text as well as color. Preserve narrow-screen and print layouts. Companion links must not be rendering dependencies.
 
 Completed examples: [small change](examples/small/spec.html) and [service change](examples/service/spec.html). These illustrate document structure, not executed or approved work.
+
+## Execution file locations
+
+When the assignment supplies an execution files directory, resolve workflow documents and review/progress artifacts there. Project source remains in the launcher-selected workspace. Use the assigned absolute paths for renderer inputs/outputs; relative Factory publication names are relative to the execution files directory, not the source checkout. Standalone assignments without this context retain their explicit/default document paths.

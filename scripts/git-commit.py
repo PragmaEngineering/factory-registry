@@ -34,6 +34,7 @@ def clean_line(value):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--workspace", help="project directory within the execution worktree")
     parser.add_argument("--type", default="chore")
     parser.add_argument("--scope")
     parser.add_argument("--description", required=True)
@@ -47,18 +48,23 @@ def main():
     context = json.load(sys.stdin)
     if context.get("version") != 1 or context.get("boundary") != "after":
         raise RuntimeError("committer requires version 1 after-hook context")
+    if args.workspace:
+        os.chdir(Path(args.workspace).resolve())
     execution = str(uuid.UUID(context["execution_id"]))
     invocation = str(uuid.UUID(context["invocation_id"]))
     root = Path(git("rev-parse", "--show-toplevel")).resolve()
-    if root != Path.cwd().resolve():
-        raise RuntimeError("run the hook from the repository root")
-    # Literal pathspecs keep wildcard and magic path syntax out of staging.
+    workspace = Path.cwd().resolve()
+    # Resolve user paths from the workspace, then anchor literal Git pathspecs
+    # at the repository root so Git does not prefix the workspace a second time.
     paths = []
     for name in args.path:
-        path = (root / name).resolve()
-        if not path.is_relative_to(root):
-            raise RuntimeError("commit paths must stay inside the project root")
-        paths.append(":(literal)" + str(path.relative_to(root)))
+        path = (workspace / name).resolve()
+        if not path.is_relative_to(workspace):
+            raise RuntimeError("commit paths must stay inside the workspace root")
+        relative = str(path.relative_to(root))
+        # Preserve existing root-workspace receipts for idempotent retries.
+        prefix = ":(literal)" if workspace == root else ":(top,literal)"
+        paths.append(prefix + relative)
     directory = Path(git("rev-parse", "--git-common-dir")).resolve() / "factory"
     receipts = directory / "commits"
     receipts.mkdir(parents=True, exist_ok=True)
@@ -67,7 +73,10 @@ def main():
         branch_receipt = directory / "executions" / (execution + ".json")
         if not branch_receipt.exists():
             raise RuntimeError("execution has no prepared branch receipt")
-        branch = json.loads(branch_receipt.read_text())["branch"]
+        owner = json.loads(branch_receipt.read_text())
+        if owner.get("mode") != "worktree" or owner.get("state") != "prepared" or Path(owner["workspace"]).resolve() != root:
+            raise RuntimeError("checkout is not this execution's prepared worktree")
+        branch = owner["branch"]
         if git("branch", "--show-current") != branch:
             raise RuntimeError("checkout is not on the execution branch")
         subject = args.type + ("(" + args.scope + ")" if args.scope else "") + ": " + description

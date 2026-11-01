@@ -23,3 +23,7 @@ For content-only reading, use the [document helper](../author-spec/scripts/docum
 Each finding records a stable ID, artifact/criterion, severity, evidence or explicit uncertainty, triggering scenario, impact, and requested resolution. Blocking findings concern agreed behavior, correctness, safety, or feasibility; preferences remain suggestions. Retain IDs across rounds and close findings as addressed with evidence, unresolved, or withdrawn with a reason.
 
 First establish independent coverage of the brief, submitted revisions, and affected boundaries. Later inspect actual changes, open findings, and affected contracts; reuse still-valid evidence. Finish with cross-document consistency and acceptance coverage. The author's summary is not a substitute for reviewing submitted evidence.
+
+## Execution file locations
+
+When the assignment supplies an execution files directory, resolve workflow documents and review/progress artifacts there. Project source remains in the launcher-selected workspace. Use the assigned absolute paths for renderer inputs/outputs; relative Factory publication names are relative to the execution files directory, not the source checkout. Standalone assignments without this context retain their explicit/default document paths.

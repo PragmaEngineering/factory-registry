@@ -54,3 +54,7 @@ Use the [plan body](assets/plan.body.html), [plan template](assets/plan.html), a
 Cite applicable project rules and source versions, and describe how the proposed change satisfies them. Project manuals remain canonical. A named pattern is not sufficient justification: specify actual boundaries, invariants, allowed dependencies, and failure behavior. Missing guidance is unknown, not authorization to invent a standard. Keep documents proportional to the change; avoid repeated inventories, speculative options, and textbook explanations.
 
 Completed examples: [small change](examples/small/plan.html) and [service change](examples/service/plan.html). These illustrate document structure, not executed or approved work.
+
+## Execution file locations
+
+When the assignment supplies an execution files directory, resolve workflow documents and review/progress artifacts there. Project source remains in the launcher-selected workspace. Use the assigned absolute paths for renderer inputs/outputs; relative Factory publication names are relative to the execution files directory, not the source checkout. Standalone assignments without this context retain their explicit/default document paths.

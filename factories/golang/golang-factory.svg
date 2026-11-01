@@ -133,8 +133,8 @@ text {font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, s
 <text x="1307" y="1482" class="title" style="fill:#23694f">Completed</text>
 <rect x="1580" y="1440" width="164" height="64" rx="32" fill="#faecee" stroke="#e3c7cc"/>
 <text x="1612" y="1481" font-size="24" style="fill:#904c59">Blocked</text>
-<text x="65" y="1472" class="small">Git lifecycle: execution before → work-branch; approved stage exit → commit-design / commit-implementation.</text>
-<text x="65" y="1501" class="small">Execution after → release-checkout. Human decisions remain outside the agent loops.</text>
+<text x="65" y="1472" class="small">Git lifecycle: execution before → prepare-worktree; approved stage exit → commit-design / commit-implementation.</text>
+<text x="65" y="1501" class="small">Execution after → release-worktree. Human decisions remain outside the agent loops.</text>
 <path d="M 64 1532 H 1744" stroke="#ced9e2"/>
 <text x="65" y="1573" class="mono small">SOURCE  registry/factories/golang/factory.json</text>
 <text x="1165" y="1573" class="mono small">CONFIG a50efefa9fc5  /  NOT A LIVE RUN</text>

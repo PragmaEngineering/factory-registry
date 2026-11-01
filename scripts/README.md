@@ -1,16 +1,20 @@
 # Workflow utilities
 
-Standalone programs invoked by configured lifecycle hooks. Factories select these executables through `command` and `arguments`; no skill loading is involved.
+Configured lifecycle hooks invoke these programs; loading a skill does not execute them.
 
-| Script | Responsibility | Hook boundary |
-|---|---|---|
-| [git-work-branch.py](git-work-branch.py) | Create/reserve an execution branch; release its checkout with `--release` | Execution `before` / `after` |
-| [git-commit.py](git-commit.py) | Commit selected paths with deterministic messages and participation trailers | Stage `after` |
+| Utility | Responsibility |
+|---|---|
+| [git-worktree.py](git-worktree.py) | Prepare one worktree and branch per execution; `--release` retains both after success |
+| [git-commit.py](git-commit.py) | Commit explicit workspace paths with deterministic Conventional Commit subjects and participant trailers |
 
-Both read the [versioned hook context](../../controls/docs/hooks.md#standard-input) from stdin. They require Python 3.9+ and Git on a Unix host. The commit utility also uses the repository's Git identity, hooks, and signing configuration.
+Both read the [version 1 hook context](../../controls/docs/hooks.md#standard-input). They require Python 3.9+ and Git on Unix; the committer preserves normal Git identity, hooks and signing. No utility pushes, merges, resets or force-deletes work. Paths/identity conflicts fail rather than adopting unrelated state.
 
-[Work-branch guidance](../skills/git-work-branch/SKILL.md) and [commit guidance](../skills/git-commit/SKILL.md) describe policy and recovery. These scripts own executable behavior; skills own instructions; factory configurations choose when to run them. Agent-specific launch helpers remain with the agents, and document-rendering scripts remain with their authoring skills.
+Use [declared factory variables](../../controls/docs/execution-files.md) to supply repository/workspace arguments consistently. Hook arguments resolve beside factory.json. Pass `--workspace` to the committer; agents independently accept the same directory through their launcher. Controls invokes commands and stores execution data; the utilities own Git behavior.
 
-Script paths in hook arguments resolve from the application directory containing `factory.json`. Use installed absolute paths when Registry is outside that application. Controls executes the injected command without a Registry lookup. Hook scripts are not copied or hashed with the execution, so keep the selected Registry revision available for its lifetime.
+[Worktree guidance](../skills/git-worktree/SKILL.md) covers retries, release and cleanup. [Commit guidance](../skills/git-commit/SKILL.md) covers attribution and staging. Documents and evidence live under the execution files directory, outside the worktree's source commits. Keep the selected utility revision installed for the execution lifetime: utility scripts are not copied with hook settings.
 
-Verify behavior with `node --test tests/git-hooks.test.mjs tests/golang-factory.test.mjs` from the Registry root. The tests use disposable Git repositories.
+```sh
+node --test tests/git-hooks.test.mjs tests/golang-factory.test.mjs tests/workspace-launch.test.mjs
+```
+
+Tests create disposable repositories and worktrees; they do not launch agents or change Registry's checkout.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,119 +8,49 @@ import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 
 const factoryDirectory = fileURLToPath(new URL('../factories/golang/', import.meta.url));
-const factory = JSON.parse(readFileSync(join(factoryDirectory, 'factory.json'), 'utf8'));
+const factory = JSON.parse(readFileSync(join(factoryDirectory, 'factory.json')));
 
-function project(t) {
-  const cwd = mkdtempSync(join(tmpdir(), 'golang-factory-hooks-'));
-  t.after(() => rmSync(cwd, { recursive: true, force: true }));
+test('configured Go hooks use one execution worktree and keep documents outside its source commits', t => {
+  const parent = mkdtempSync(join(tmpdir(), 'go-worktree-'));
+  t.after(() => rmSync(parent, { recursive: true, force: true }));
+  const project = join(parent, 'project'); mkdirSync(project);
   const env = { ...process.env, GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
-  const git = (...args) => {
+  const git = (cwd, ...args) => {
     const result = spawnSync('git', args, { cwd, env, encoding: 'utf8' });
-    assert.equal(result.status, 0, result.stderr);
-    return result.stdout.trim();
+    assert.equal(result.status, 0, result.stderr); return result.stdout.trim();
   };
-  git('init', '-q');
-  git('config', 'user.name', 'Factory test');
-  git('config', 'user.email', 'test@example.invalid');
-  git('config', 'commit.gpgsign', 'false');
-  writeFileSync(join(cwd, 'main.go'), 'package main\n');
-  git('add', '.');
-  git('commit', '-qm', 'chore: seed temporary project');
-  const execution = randomUUID();
-  const before = { version: 1, execution_id: execution, invocation_id: randomUUID(), project: cwd, scope: 'execution', boundary: 'before' };
-  function runHooks(hooks, context) {
-    return hooks.map(hook => {
-      const [script, ...args] = hook.arguments;
-      return spawnSync(hook.command, [resolve(factoryDirectory, script), ...args], {
-        cwd, env, encoding: 'utf8', input: JSON.stringify({ ...context, name: hook.name }),
-      });
-    });
+  git(project, 'init', '-q', '-b', 'main'); git(project, 'config', 'user.name', 'Go factory test');
+  git(project, 'config', 'user.email', 'test@example.invalid'); git(project, 'config', 'commit.gpgsign', 'false');
+  writeFileSync(join(project, '.gitignore'), '.factory/\n'); writeFileSync(join(project, 'main.go'), 'package main\n');
+  git(project, 'add', '.'); git(project, 'commit', '-qm', 'test: seed');
+  const id = randomUUID();
+  const values = { 'execution.project': project, 'execution.id': id, 'execution.factory_dir': join(project, '.factory') };
+  for (const [key, value] of Object.entries(factory.variables)) {
+    values['variables.' + key] = value.replace(/\$\{([^}]+)\}/g, (_, key) => { assert.ok(values[key]); return values[key]; });
   }
-  const run = (boundary, context) => runHooks(factory.hooks[boundary], context);
-  const runStage = (name, context) => runHooks(factory.workflow.stages.find(stage => stage.name === name).hooks.after, context);
-  return { cwd, git, before, run, runStage, execution };
-}
-
-test('Go factory hooks preserve retried work, reserve the checkout and create distinct execution branches', t => {
-  const p = project(t);
-  const startingCommit = p.git('rev-parse', 'HEAD');
-  let results = p.run('before', p.before);
-  for (const result of results) assert.equal(result.status, 0, result.stderr);
-  const firstBranch = p.git('branch', '--show-current');
-  assert.equal(firstBranch, `execution/${p.execution}`);
-  assert.equal(p.git('rev-parse', 'HEAD'), startingCommit);
-  writeFileSync(join(p.cwd, 'main.go'), 'package main\n// execution work\n');
-  for (const result of p.run('before', p.before)) assert.equal(result.status, 0, result.stderr);
-  assert.match(readFileSync(join(p.cwd, 'main.go'), 'utf8'), /execution work/);
-  const another = { ...p.before, invocation_id: randomUUID(), execution_id: randomUUID() };
-  results = p.run('before', another);
-  assert.notEqual(results[0].status, 0);
-  assert.match(results[0].stderr, /reserved by another execution/);
-  for (const result of p.run('after', { ...p.before, invocation_id: randomUUID(), boundary: 'after' })) assert.equal(result.status, 0, result.stderr);
-  assert.equal(p.git('branch', '--show-current'), firstBranch);
-  assert.match(p.git('diff'), /execution work/);
-  results = p.run('before', another);
-  assert.notEqual(results[0].status, 0);
-  assert.match(results[0].stderr, /checkout has existing changes/);
-  // Only discard the known fixture edit, inside this temporary test project.
-  p.git('restore', 'main.go');
-  for (const result of p.run('before', another)) assert.equal(result.status, 0, result.stderr);
-  assert.equal(p.git('branch', '--show-current'), `execution/${another.execution_id}`);
-  assert.notEqual(p.git('branch', '--show-current'), firstBranch);
-  assert.equal(p.git('rev-parse', 'HEAD'), startingCommit);
-});
-
-test('Go factory rejects an initially dirty checkout without changing its branch', t => {
-  const p = project(t);
-  const branch = p.git('branch', '--show-current');
-  writeFileSync(join(p.cwd, 'untracked.txt'), 'unrelated work');
-  const results = p.run('before', p.before);
-  assert.notEqual(results[0].status, 0);
-  assert.match(results[0].stderr, /checkout has existing changes/);
-  assert.equal(p.git('branch', '--show-current'), branch);
-  assert.equal(readFileSync(join(p.cwd, 'untracked.txt'), 'utf8'), 'unrelated work');
-});
-
-test('configured Go stage commits preserve the approved design and attribute both agents without duplicate commits', t => {
-  const p = project(t);
-  for (const result of p.run('before', p.before)) assert.equal(result.status, 0, result.stderr);
-  mkdirSync(join(p.cwd, 'reviews'));
-  writeFileSync(join(p.cwd, 'spec.html'), '<h1>Specification</h1>');
-  writeFileSync(join(p.cwd, 'plan.html'), '<h1>Plan</h1>');
-  writeFileSync(join(p.cwd, 'reviews/architecture.md'), 'Ready for design approval.');
-  const design = {
-    ...p.before, invocation_id: randomUUID(), scope: 'stage', boundary: 'after', stage: 'design', stage_visit: 1,
-    participants: [
-      { agent: 'architect', instance_id: 'architect-instance', step: 'specification', visit: 1, attempt: 1, outcome: 'completed' },
-      { agent: 'architecture_reviewer', instance_id: 'design-reviewer-instance', step: 'architecture_review', visit: 1, attempt: 1, outcome: 'completed' },
-    ],
+  const workspace = values['variables.workspace'];
+  const files = join(project, '.factory', 'executions', id, 'files'); mkdirSync(files, { recursive: true });
+  const context = { version: 1, execution_id: id, invocation_id: randomUUID(), project, files_dir: files, scope: 'execution', boundary: 'before' };
+  const run = (hook, ctx) => {
+    const [script, ...args] = hook.arguments;
+    const result = spawnSync(hook.command, [resolve(factoryDirectory, script), ...args.map(value => value.replace(/\$\{([^}]+)\}/g, (_, key) => { assert.ok(values[key]); return values[key]; }))], { cwd: project, env, encoding: 'utf8', input: JSON.stringify(ctx) });
+    assert.equal(result.status, 0, result.stderr); return JSON.parse(result.stdout);
   };
-  for (const result of p.runStage('design', design)) assert.equal(result.status, 0, result.stderr);
-  assert.equal(p.git('log', '-1', '--format=%s'), 'docs(design): record approved specification and plan');
-  assert.deepEqual(p.git('show', '--format=', '--name-only', 'HEAD').split('\n').sort(), ['plan.html', 'reviews/architecture.md', 'spec.html']);
-  const designCommit = p.git('rev-parse', 'HEAD');
-  for (const result of p.runStage('design', design)) assert.equal(result.status, 0, result.stderr);
-  assert.equal(p.git('rev-parse', 'HEAD'), designCommit);
-  writeFileSync(join(p.cwd, 'main.go'), 'package main\nfunc main() {}\n');
-  writeFileSync(join(p.cwd, 'reviews/build.md'), 'Implementation checks passed.');
-  writeFileSync(join(p.cwd, 'reviews/code.md'), 'Independent review completed.');
-  const implementation = {
-    ...design, invocation_id: randomUUID(), stage: 'implementation',
-    participants: [
-      { agent: 'coder_golang', instance_id: 'coder-instance', step: 'build', visit: 1, attempt: 1, outcome: 'ready_for_review' },
-      { agent: 'code_reviewer_golang', instance_id: 'code-reviewer-instance', step: 'code_review', visit: 1, attempt: 1, outcome: 'completed' },
-    ],
-  };
-  for (const result of p.runStage('implementation', implementation)) assert.equal(result.status, 0, result.stderr);
-  assert.equal(p.git('log', '-1', '--format=%s'), 'chore(implementation): record accepted work');
-  const message = p.git('log', '-1', '--format=%B');
-  assert.match(message, /Agent-Invocation: coder_golang\/coder-instance\/build\/v1\/t1/);
-  assert.match(message, /Agent-Invocation: code_reviewer_golang\/code-reviewer-instance\/code_review\/v1\/t1/);
-  const implementationCommit = p.git('rev-parse', 'HEAD');
-  for (const result of p.runStage('implementation', implementation)) assert.equal(result.status, 0, result.stderr);
-  assert.equal(p.git('rev-parse', 'HEAD'), implementationCommit);
-  assert.equal(p.git('rev-list', '--count', 'HEAD'), '3');
-  assert.equal(p.git('status', '--porcelain'), '');
-  for (const result of p.run('after', { ...p.before, invocation_id: randomUUID(), boundary: 'after' })) assert.equal(result.status, 0, result.stderr);
-  assert.equal(p.git('branch', '--show-current'), `execution/${p.execution}`);
+  run(factory.hooks.before[0], context);
+  assert.equal(git(project, 'branch', '--show-current'), 'main');
+  assert.equal(git(workspace, 'branch', '--show-current'), 'execution/' + id);
+  writeFileSync(join(files, 'spec.html'), 'specification'); writeFileSync(join(files, 'plan.html'), 'plan');
+  const design = { ...context, invocation_id: randomUUID(), scope: 'stage', boundary: 'after', stage: 'design', participants: [] };
+  const stage = name => factory.workflow.stages.find(stage => stage.name === name).hooks.after[0];
+  assert.equal(run(stage('design'), design).state, 'no_changes');
+  writeFileSync(join(workspace, 'main.go'), 'package changed\n');
+  const implementation = { ...design, stage: 'implementation', invocation_id: randomUUID(), participants: [
+    { agent: 'coder_golang', instance_id: 'coder', step: 'build', visit: 1, attempt: 1, outcome: 'ready_for_review' },
+    { agent: 'code_reviewer_golang', instance_id: 'reviewer', step: 'code_review', visit: 1, attempt: 1, outcome: 'completed' },
+  ] };
+  const commit = run(stage('implementation'), implementation).commit;
+  assert.equal(run(stage('implementation'), implementation).commit, commit);
+  assert.equal(git(workspace, 'show', '--format=', '--name-only', 'HEAD'), 'main.go');
+  run(factory.hooks.after[0], { ...context, boundary: 'after', invocation_id: randomUUID() });
+  assert.equal(git(project, 'status', '--porcelain'), '');
 });
