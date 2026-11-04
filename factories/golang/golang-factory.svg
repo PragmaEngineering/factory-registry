@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1630" viewBox="0 0 1800 1630" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1740" viewBox="0 0 1800 1740" role="img" aria-labelledby="title description">
 <title id="title">Go coding factory: admission, design, implementation, and human acceptance</title>
-<desc id="description">The task-readiness classifier admits an accepted task at probability 0.85 or higher; other valid assessments require a human admission override. Design runs architect and architecture reviewer sequentially for up to three rounds per visit, followed by human design approval. Implementation runs Go coder and code reviewer sequentially for up to three rounds per visit, followed by human acceptance. Human change requests start another bounded visit. Rejection or execution failure blocks the run. Execution hooks prepare an execution branch and release its checkout after success; stage after hooks create commits after design approval and final acceptance.</desc>
+<desc id="description">The task-readiness classifier admits an accepted task at probability 0.85 or higher; other valid assessments require a human admission override. Design runs architect and architecture reviewer sequentially for up to three rounds per visit, followed by human design approval. Implementation runs Go coder and code reviewer sequentially for up to three rounds per visit, followed by human acceptance. Human change requests start another bounded visit. Rejection or execution failure blocks the run. Execution hooks prepare an execution worktree and retain its checkout after success; stage after hooks create commits after design approval and final acceptance.</desc>
 <defs>
   <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.7" fill="#d5dde8" opacity="0.55"/></pattern>
   <linearGradient id="paper" x2="0" y2="1"><stop stop-color="#f8fafc"/><stop offset="1" stop-color="#edf3f7"/></linearGradient>
@@ -19,12 +19,12 @@ text {font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, s
 .return {fill:none;stroke:#087e83;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;marker-end:url(#teal)}
 .reject {fill:none;stroke:#a65b63;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
 </style>
-<rect width="1800" height="1630" fill="url(#paper)"/>
-<rect width="1800" height="1630" fill="url(#grid)"/>
+<rect width="1800" height="1740" fill="url(#paper)"/>
+<rect width="1800" height="1740" fill="url(#grid)"/>
 <rect x="64" y="62" width="48" height="5" rx="2" fill="#087e83"/>
 <text x="64" y="103" class="label">PRAGMA / WORKFLOW LIBRARY</text>
 <text x="61" y="170" font-size="62" font-weight="600" letter-spacing="-2">The Go coding factory</text>
-<text x="65" y="212" font-size="24" fill="#5b6d80">Execution branches, bounded review loops, and approved-stage commits.</text>
+<text x="65" y="212" font-size="24" fill="#5b6d80">Execution worktrees, bounded review loops, and approved-stage commits.</text>
 <text x="1560" y="155" font-size="82" font-weight="600" fill="#087e83" opacity="0.11">GO</text>
 
 <text x="65" y="268" class="label">00 / ADMISSION</text>
@@ -137,5 +137,9 @@ text {font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, s
 <text x="65" y="1501" class="small">Execution after → release-worktree. Human decisions remain outside the agent loops.</text>
 <path d="M 64 1532 H 1744" stroke="#ced9e2"/>
 <text x="65" y="1573" class="mono small">SOURCE  registry/factories/golang/factory.json</text>
-<text x="1165" y="1573" class="mono small">CONFIG a50efefa9fc5  /  NOT A LIVE RUN</text>
+<text x="1165" y="1573" class="mono small">CONFIG 322ed822d4ad  /  NOT A LIVE RUN</text>
+<path d="M64 1610 H1744" stroke="#ced9e2"/>
+<text x="65" y="1650" class="label" style="fill:#087e83">NATIVE RUNTIME / DISTINCT FROM THE COMMAND HOST</text>
+<text x="65" y="1684" class="small">Four agent packages select Pi 1.0.3; readiness remains an opaque MCP command package.</text>
+<text x="65" y="1714" class="small">Controls prepares native profiles; entrypoints select source workspace and role skills; the bridge configures MCP.</text>
 </svg>

@@ -29,7 +29,11 @@
         "${variables.workspace}",
         "-p",
         "{prompt}"
-      ]
+      ],
+      "runtime": {
+        "name": "pi",
+        "version": "=1.0.3"
+      }
     },
     {
       "name": "architecture_reviewer",
@@ -40,7 +44,11 @@
         "${variables.workspace}",
         "-p",
         "{prompt}"
-      ]
+      ],
+      "runtime": {
+        "name": "pi",
+        "version": "=1.0.3"
+      }
     },
     {
       "name": "coder_golang",
@@ -51,7 +59,11 @@
         "${variables.workspace}",
         "-p",
         "{prompt}"
-      ]
+      ],
+      "runtime": {
+        "name": "pi",
+        "version": "=1.0.3"
+      }
     },
     {
       "name": "code_reviewer_golang",
@@ -62,7 +74,11 @@
         "${variables.workspace}",
         "-p",
         "{prompt}"
-      ]
+      ],
+      "runtime": {
+        "name": "pi",
+        "version": "=1.0.3"
+      }
     }
   ],
   "workflow": {

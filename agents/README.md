@@ -38,3 +38,9 @@ Conventional commits and Linear context remain optional library skills. Link the
 Both design agents include the on-demand [Go planning evidence skill](../skills/go-planning-evidence/SKILL.md). Other languages keep the generic planning method. Author skills render content-only HTML bodies with the shared document helper; review skills use the same helper to read content without CSS.
 
 Managed packages may omit Pi-specific `args`: when `-p` is absent, the Pi adapter reads the assignment from `FACTORY_PROMPT_PATH`. That assignment includes explicitly bound structured inputs. This does not change standalone `start.sh -p "..."` usage or native provider/model configuration.
+
+## Managed native runtime
+
+Declare `runtime: {"name":"pi","version":"=1.0.3"}` in the package/agent registration in `factory.json`. Controls’ Pi preparer owns the private managed profile and exact native executable. These launchers reuse it, select the source workspace, preflight role tools and load linked skills; they do not copy another managed profile. Standalone startup remains independent. The bridge alone injects Factory MCP settings. See [Controls’ runtime contributor guide](../../controls/docs/runtime-adapters.md). Pi override settings remain unsupported pending CTRL-005.
+
+Managed native selection is checked before launch; Pi 1.0.3 is currently supported. Native identity/capabilities are recorded separately from the command host. See [the preparation ownership diagram](../../controls/docs/images/runtime-adapters.svg). The current Pi lifecycle routing defect (CTRL-001) remains open.

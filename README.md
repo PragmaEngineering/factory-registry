@@ -95,3 +95,7 @@ For discovery by an installed Pi, set `PI_SKILL_LOADER` to that installation's `
 ## Execution documents
 
 With Controls, `factory_dir` defaults to `.factory` beside factory.json. Specs, plans and review evidence belong to its execution-specific `files/` directory; source stays in the workspace selected by the launcher. No files-directory environment variable is required. [Configuration and references](../controls/docs/execution-files.md) define the directory and argument contract. Go agent entrypoints accept an optional leading `--workspace DIRECTORY`; remaining options pass unchanged to Pi.
+
+## Native runtime integration
+
+Example Pi agent registrations explicitly select `runtime: {"name":"pi","version":"=1.0.3"}`. Controls prepares managed profiles; agent bundles retain native defaults and standalone startup. Pi factory-level overrides remain CTRL-005. See [agent startup](agents/README.md#managed-native-runtime) and [adding another runner](../controls/docs/runtime-adapters.md) for ownership, capabilities and compatibility.

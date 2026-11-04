@@ -62,3 +62,9 @@ Stage after hooks commit only after the stage exits through its human approval. 
 Specs/plans/review documents remain in execution storage. The design hook records an idempotent no-change receipt if it has no project changes; it does not copy documents into Git. The implementation hook includes source additions and deletions, scoped to the configured workspace. Configure narrower paths when appropriate.
 
 Commit trailers identify the execution, hook invocation, stage and participating agent instances/visits/attempts. Successful retries reuse existing commits; normal repository hooks and signing remain enabled. Worktree preparation/release does not commit, push or merge. See [hook ordering and retries](../../../controls/docs/hooks.md).
+
+## Native runtime integration
+
+The four agent packages require Pi 1.0.3 and explicitly declare that requirement in `runtime`. Readiness remains a deterministic MCP command package. Controls checks native compatibility and prepares a private profile; launchers retain workspace selection and linked skills, and the native bridge owns MCP configuration.
+
+Pi provider/model settings still come from the bundled native profiles: `with` overrides are pending CTRL-005. Concurrent collaboration requires an adapter with peer/idle delivery; lifecycle routing remains limited by CTRL-001. See [the runtime guide](../../../controls/docs/runtime-adapters.md) and [ownership diagram](../../../controls/docs/images/runtime-adapters.svg). Native preparation introduces no workflow steps and supplies no sandboxing.

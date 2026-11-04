@@ -6,13 +6,27 @@
       "name": "pair_writer",
       "path": "../../agents/pair_writer",
       "entrypoint": "start.sh",
-      "args": ["-p", "{prompt}"]
+      "args": [
+        "-p",
+        "{prompt}"
+      ],
+      "runtime": {
+        "name": "pi",
+        "version": "=1.0.3"
+      }
     },
     {
       "name": "architecture_reviewer",
       "path": "../../agents/architecture_reviewer",
       "entrypoint": "start.sh",
-      "args": ["-p", "{prompt}"]
+      "args": [
+        "-p",
+        "{prompt}"
+      ],
+      "runtime": {
+        "name": "pi",
+        "version": "=1.0.3"
+      }
     }
   ],
   "recipe": "README.md",

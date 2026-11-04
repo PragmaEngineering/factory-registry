@@ -23,11 +23,17 @@ if [ -n "${AGENT_INSTRUCTIONS_FILE:-}" ]; then
   exec "${AGENT_EXECUTABLE:-pi}" --append-system-prompt "$AGENT_INSTRUCTIONS_FILE" "$@"
 fi
 # Standalone sessions use this bundle's Pi profile and linked skills.
-runtime_root=${FACTORY_AGENT_RUNTIME_DIR:-"${HOME}/.factory/agents"}
-mkdir -p "$runtime_root"
-profile=$(mktemp -d "$runtime_root/${agent_dir##*/}.XXXXXX")
-cp "$agent_dir"/pi/*.json "$profile/"
-export PI_CODING_AGENT_DIR="$profile"
+if [ "${FACTORY_RUNTIME_NAME:-}" = "pi" ]; then
+  # Controls' Pi preparer owns the private managed profile and executable.
+  profile=${PI_CODING_AGENT_DIR:?Managed Pi profile is required}
+else
+  # Standalone agents retain their own native defaults without Controls.
+  runtime_root=${FACTORY_AGENT_RUNTIME_DIR:-"${HOME}/.factory/agents"}
+  mkdir -p "$runtime_root"
+  profile=$(mktemp -d "$runtime_root/${agent_dir##*/}.XXXXXX")
+  cp "$agent_dir"/pi/*.json "$profile/"
+  export PI_CODING_AGENT_DIR="$profile"
+fi
 node "$agent_dir/../scripts/preflight.mjs" --agent "${AGENT_EXECUTABLE:-pi}" --require rg --profile "$profile"
 set -- --append-system-prompt "$agent_dir/agent.md" --no-skills "$@"
 for skill in "$agent_dir"/skills/*; do
