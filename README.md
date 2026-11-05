@@ -43,6 +43,7 @@ Keep Factory Workflows and this repository outside the application. Place a comp
 From the application root:
 
 ```sh
+factory start
 factory exec "Add a small feature"
 factory ls
 factory EXECUTION-ID
@@ -98,4 +99,4 @@ With Controls, `factory_dir` defaults to `.factory` beside factory.json. Specs, 
 
 ## Native runtime integration
 
-Example Pi agent registrations explicitly select `runtime: {"name":"pi","version":"=1.0.3"}`. Controls prepares managed profiles; agent bundles retain native defaults and standalone startup. Pi factory-level overrides remain CTRL-005. See [agent startup](agents/README.md#managed-native-runtime) and [adding another runner](../controls/docs/runtime-adapters.md) for ownership, capabilities and compatibility.
+Example Pi agent registrations explicitly select `runtime: {"name":"pi","version":"=1.0.3"}`. Controls prepares managed profiles; agent bundles retain native defaults and standalone startup. Pi supports [per-package provider/model/credential overrides](../controls/docs/pi-overrides.md) without changing bundled defaults. See [agent startup](agents/README.md#managed-native-runtime) and [adding another runner](../controls/docs/runtime-adapters.md) for ownership, capabilities and compatibility.

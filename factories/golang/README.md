@@ -4,7 +4,7 @@
 
 Copy this factory.json into the application's configuration directory, then update each package path and hook script path for the installed Registry. Paths resolve beside factory.json. The library's `../../agents`, `../../classifiers` and `../../scripts` paths are examples for this checkout, not install discovery. See [execution files and variables](../../../controls/docs/execution-files.md) and the [GO-001 eval guide](../../../evals/README.md).
 
-From the application root, run `factory exec "Your request"`, then inspect `factory ls`, `factory EXECUTION-ID`, and `factory inbox`. Answer human decisions with `factory answer REQUEST-ID OUTCOME --reason "..."`. Agents communicate through the [thread MCP runtime](../../../controls/adapters/README.md) and submit explicit `step_result` messages. The example requires files only for its listed `outputs_on` outcomes, so a blocker can retain its cause without producing success artifacts.
+Start the shared service with `factory start`. From the application root, run `factory exec "Your request"`, then inspect `factory ls`, `factory EXECUTION-ID`, and `factory inbox`. Answer human decisions with `factory answer REQUEST-ID OUTCOME --reason "..."`. Agents communicate through the [thread MCP runtime](../../../controls/adapters/README.md) and submit explicit `step_result` messages. The example requires files only for its listed `outputs_on` outcomes, so a blocker can retain its cause without producing success artifacts.
 
 The existing agent profiles use Pi and require Pi, Node.js, working model credentials, and any enabled MCP tools on the host. The `gopls` MCP in the coder and reviewer profiles needs `gopls` on `PATH`. The local command runner is a host process, not a sandbox; only run trusted agent packages. The workflow no longer uses the old Comms task service or Ralph loop configuration. The build agent can still use its coding and checking skills within its assigned step.
 
@@ -29,7 +29,7 @@ Input → readiness ─ admitted ───────────────�
                   design → design approval → implementation → acceptance
 ```
 
-The threshold is configured under the readiness package's `with.admission.minimum_probability`. It is an initial policy, not a validated accuracy guarantee. Install the classifier's MCP dependency with `npm ci --prefix /path/to/controls`, followed by `npm ci --prefix /path/to/registry` and make its configured provider credential available in the Factory service environment. Its provider/model configuration is separate from the agents' native profiles.
+The threshold is configured under the readiness package's `overrides.admission.minimum_probability`. It is an initial policy, not a validated accuracy guarantee. Install the classifier's MCP dependency with `npm ci --prefix /path/to/controls`, followed by `npm ci --prefix /path/to/registry` and make its configured provider credential available in the Factory service environment. Its provider/model configuration is separate from the agents' native profiles.
 
 ```sh
 factory answer REQUEST-ID approve --reason "Missing context is ...; I authorize admission."
@@ -67,7 +67,7 @@ Commit trailers identify the execution, hook invocation, stage and participating
 
 The four agent packages require Pi 1.0.3 and explicitly declare that requirement in `runtime`. Readiness remains a deterministic MCP command package. Controls checks native compatibility and prepares a private profile; launchers retain workspace selection and linked skills, and the native bridge owns MCP configuration.
 
-Pi provider/model settings still come from the bundled native profiles: `with` overrides are pending CTRL-005. Concurrent collaboration requires an adapter with peer/idle delivery; lifecycle observations go only to the controller and cannot wake peers. See [the runtime guide](../../../controls/docs/runtime-adapters.md) and [ownership diagram](../../../controls/docs/images/runtime-adapters.svg). Native preparation introduces no workflow steps and supplies no sandboxing.
+Each package registration explicitly lists its supported `overrides`, populated from the current bundle defaults. Edit them independently for each agent: provider, model, endpoint, credential environment name, thinking and model metadata. The architect and both reviewers use `high` thinking; the coder uses `medium`. Readiness also exposes its endpoint, timeout, request/response limits and existing admission threshold. Pi model pricing is currently unconfigured: the explicit zero costs preserve Pi’s native defaults and must not be interpreted as free usage; replace them with verified pricing when needed. Skills, tools and MCPs remain in the agent bundles because the current Pi override schema does not expose them. See [per-agent provider/model/credential configuration](../../../controls/docs/pi-overrides.md). Concurrent collaboration requires an adapter with peer/idle delivery; lifecycle observations go only to the controller and cannot wake peers. See [the runtime guide](../../../controls/docs/runtime-adapters.md) and [ownership diagram](../../../controls/docs/images/runtime-adapters.svg). Native preparation introduces no workflow steps and supplies no sandboxing.
 
 ## Source workspace and execution files
 

@@ -13,7 +13,7 @@ A small Jev classification package for new-task admission. It asks whether a tas
 | `evaluate.mjs` | Input construction, captured-document digest checks, bounded provider call and answer validation. |
 | `run.mjs` / `start.sh` | Factory entrypoint: reads bound inputs/settings, connects MCP, saves the evaluation and submits its result. |
 
-Use a copy of this bundle for a different rubric or question set. Factory pins the bundle digest and effective `with` settings. Changes after an execution starts invalidate its package hash.
+Use a copy of this bundle for a different rubric or question set. Factory pins the bundle digest and effective `overrides` settings. Changes after an execution starts invalidate its package hash.
 
 ## Configuration
 
@@ -24,7 +24,7 @@ Defaults use OpenRouter's Decisions endpoint and `typesafe/jev-1.14`. Only the O
   "name": "readiness",
   "path": "/path/to/registry/classifiers/task-readiness",
   "entrypoint": "start.sh",
-  "with": {
+  "overrides": {
     "provider": "openrouter",
     "endpoint": "https://openrouter.ai/api/alpha/decisions",
     "model": "typesafe/jev-1.14",
@@ -34,7 +34,7 @@ Defaults use OpenRouter's Decisions endpoint and `typesafe/jev-1.14`. Only the O
 }
 ```
 
-The credential value must exist in the **Factory service's environment**, not just a later client terminal. `with` contains its variable name, never the secret. Native model/provider configuration for the downstream planning agent is independent of this classifier's configuration.
+The credential value must exist in the **Factory service's environment**, not just a later client terminal. `overrides` contains its variable name, never the secret. Native model/provider configuration for the downstream planning agent is independent of this classifier's configuration.
 
 Requires Node.js 22+ and the Controls SDK dependency, installed through Registry. The Go binary installer does not install these npm dependencies. With sibling Controls and Registry checkouts:
 
@@ -66,7 +66,7 @@ Bind later step inputs to outputs named `request` and `response`. The original b
 
 ## Enforced admission
 
-Set `with.admission` to `{"minimum_probability":0.85}` to enforce readiness. The number is the returned **probability of the `accept` label**, not the separate `confidence` statistic. Any finite threshold from 0 to 1 is valid configuration. The example's 0.85 is an initial policy, not an empirically validated guarantee.
+Set `overrides.admission` to `{"minimum_probability":0.85}` to enforce readiness. The number is the returned **probability of the `accept` label**, not the separate `confidence` statistic. Any finite threshold from 0 to 1 is valid configuration. The example's 0.85 is an initial policy, not an empirically validated guarantee.
 
 | Valid assessment | Result outcome |
 |---|---|
