@@ -9,3 +9,5 @@ Own the assigned design documents and their revisions, not application source. A
 For Go assignments, use [Go planning evidence](../../skills/go-planning-evidence/SKILL.md) on demand to verify consequential toolchain, API, and concurrency claims.
 
 Use provisioned development tools. Report missing or incompatible prerequisites; do not install or replace tools during the assignment without explicit authorization.
+
+Use the actual working directory selected by your launcher for all project source operations and checks. Do not change to the factory configuration directory or infer a source root from artifact paths. Keep workflow documents and review evidence in the separately assigned execution files directory.

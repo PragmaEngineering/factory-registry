@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,7 +43,30 @@ test('configured Go hooks use one execution worktree and keep documents outside 
   const design = { ...context, invocation_id: randomUUID(), scope: 'stage', boundary: 'after', stage: 'design', participants: [] };
   const stage = name => factory.workflow.stages.find(stage => stage.name === name).hooks.after[0];
   assert.equal(run(stage('design'), design).state, 'no_changes');
-  writeFileSync(join(workspace, 'main.go'), 'package changed\n');
+  // Exercise the real package launchers from the configuration directory.
+  // Fake native agents edit/review source only in the launcher-selected cwd.
+  const tools=join(parent,'tools');mkdirSync(tools);
+  for(const command of ['rg','go','gofmt','golangci-lint'])writeFileSync(join(tools,command),'#!/bin/sh\nexit 0\n',{mode:0o755});
+  const profile=join(parent,'profile');mkdirSync(profile);
+  writeFileSync(join(profile,'settings.json'),JSON.stringify({defaultProvider:'fixture',defaultModel:'fixture'}));
+  mkdirSync(join(files,'reviews'));
+  const native=join(parent,'native');
+  writeFileSync(native,`#!${process.execPath}
+import {readFileSync,writeFileSync} from 'node:fs';
+if(process.env.TEST_ROLE==='coder_golang') writeFileSync('main.go','package changed\\n');
+else if(readFileSync('main.go','utf8')!=='package changed\\n') throw new Error('reviewer inspected a different source tree');
+writeFileSync(process.env.TEST_FILES+'/reviews/'+process.env.TEST_ROLE+'.md','source checks performed in '+process.cwd());
+console.log(JSON.stringify({cwd:process.cwd()}));
+`,{mode:0o755});
+  const launchEnv=Object.fromEntries(Object.entries(env).filter(([key])=>!key.startsWith('FACTORY_')&&!key.startsWith('PI_')&&!key.startsWith('AGENT_')));
+  for(const name of ['coder_golang','code_reviewer_golang']) {
+    const pkg=factory.packages.find(pkg=>pkg.name===name);
+    const result=spawnSync(resolve(factoryDirectory,pkg.path,pkg.entrypoint),['--workspace',workspace,'-p','fixture work'],{cwd:project,env:{...launchEnv,PATH:tools+':'+env.PATH,AGENT_EXECUTABLE:native,FACTORY_RUNTIME_NAME:'pi',PI_CODING_AGENT_DIR:profile,TEST_ROLE:name,TEST_FILES:files},encoding:'utf8'});
+    assert.equal(result.status,0,result.stderr);
+    assert.equal(JSON.parse(result.stdout).cwd,realpathSync(workspace));
+    assert.equal(readFileSync(join(project,'main.go'),'utf8'),'package main\n');
+    assert.match(readFileSync(join(files,'reviews',name+'.md'),'utf8'),/source checks performed in/);
+  }
   const implementation = { ...design, stage: 'implementation', invocation_id: randomUUID(), participants: [
     { agent: 'coder_golang', instance_id: 'coder', step: 'build', visit: 1, attempt: 1, outcome: 'ready_for_review' },
     { agent: 'code_reviewer_golang', instance_id: 'reviewer', step: 'code_review', visit: 1, attempt: 1, outcome: 'completed' },

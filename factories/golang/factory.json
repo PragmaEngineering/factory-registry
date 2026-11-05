@@ -190,7 +190,7 @@
               "name": "build",
               "type": "run",
               "title": "Implement approved plan",
-              "instructions": "Implement the approved spec and plan in the project root. Run relevant checks, record progress and evidence, and hand off the changes for independent review. Write commands, results, changed files, and limitations to reviews/build.md. Keep coherent plan-item progress and bounded check evidence. Resolve review findings against actual source; publish the revised work with finding resolutions. Work in the workspace selected by your launcher; it is the execution worktree prepared by the before hook. Write workflow documents and review evidence to the assigned execution files directory. Leave changes unstaged; do not commit or switch branches. Report changes and verification through the assigned artifacts and Factory messages.",
+              "instructions": "Implement the approved spec and plan in the source workspace selected by your launcher. Run relevant checks, record progress and evidence, and hand off the changes for independent review. Write commands, results, changed files, and limitations to reviews/build.md. Keep coherent plan-item progress and bounded check evidence. Resolve review findings against actual source; publish the revised work with finding resolutions. Work in the workspace selected by your launcher; it is the execution worktree prepared by the before hook. Write workflow documents and review evidence to the assigned execution files directory. Leave changes unstaged; do not commit or switch branches. Report changes and verification through the assigned artifacts and Factory messages.",
               "inputs": [
                 "approved spec.html",
                 "approved plan.html",

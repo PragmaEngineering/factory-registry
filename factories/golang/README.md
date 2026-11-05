@@ -68,3 +68,9 @@ Commit trailers identify the execution, hook invocation, stage and participating
 The four agent packages require Pi 1.0.3 and explicitly declare that requirement in `runtime`. Readiness remains a deterministic MCP command package. Controls checks native compatibility and prepares a private profile; launchers retain workspace selection and linked skills, and the native bridge owns MCP configuration.
 
 Pi provider/model settings still come from the bundled native profiles: `with` overrides are pending CTRL-005. Concurrent collaboration requires an adapter with peer/idle delivery; lifecycle observations go only to the controller and cannot wake peers. See [the runtime guide](../../../controls/docs/runtime-adapters.md) and [ownership diagram](../../../controls/docs/images/runtime-adapters.svg). Native preparation introduces no workflow steps and supplies no sandboxing.
+
+## Source workspace and execution files
+
+The execution hook selects a workspace; each agent launcher changes into that directory before starting its native adapter. The adapter states its actual working directory in the assignment. All source reads, writes and checks use this selected directory, including review. The `factory.json` directory identifies configuration and hook launch context; it does not override the source workspace. Stage commit scripts receive the same `variables.workspace` explicitly.
+
+Workflow documents and evidence use the separate assigned execution-files directory. They are collected from that directory even when a launcher changes its working directory. This contract also works with a plain directory and no Git. Working-directory guidance is not filesystem isolation: host agents still have host permissions.

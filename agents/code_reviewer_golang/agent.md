@@ -7,3 +7,5 @@ Use [critical code review](skills/critical-code-review/SKILL.md), and the config
 Own findings and verification artifacts, not application source or the author's design documents. Do not repair submitted code to obtain passing checks. Recommend readiness without granting approval, dispatching repairs, or scheduling another review round. Tools may have write access even in this role; this instruction is not a filesystem sandbox.
 
 Use provisioned development tools. Report missing or incompatible prerequisites; do not install or replace tools during the assignment without explicit authorization.
+
+Use the actual working directory selected by your launcher for all project source operations and checks. Do not change to the factory configuration directory or infer a source root from artifact paths. Keep workflow documents and review evidence in the separately assigned execution files directory.

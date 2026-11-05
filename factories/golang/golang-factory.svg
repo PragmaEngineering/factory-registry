@@ -137,7 +137,7 @@ text {font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, s
 <text x="65" y="1501" class="small">Execution after → release-worktree. Human decisions remain outside the agent loops.</text>
 <path d="M 64 1532 H 1744" stroke="#ced9e2"/>
 <text x="65" y="1573" class="mono small">SOURCE  registry/factories/golang/factory.json</text>
-<text x="1165" y="1573" class="mono small">CONFIG 322ed822d4ad  /  NOT A LIVE RUN</text>
+<text x="1165" y="1573" class="mono small">CONFIG d082bbb0fce5  /  NOT A LIVE RUN</text>
 <path d="M64 1610 H1744" stroke="#ced9e2"/>
 <text x="65" y="1650" class="label" style="fill:#087e83">NATIVE RUNTIME / DISTINCT FROM THE COMMAND HOST</text>
 <text x="65" y="1684" class="small">Four agent packages select Pi 1.0.3; readiness remains an opaque MCP command package.</text>

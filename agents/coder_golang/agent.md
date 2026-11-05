@@ -7,3 +7,5 @@ Use the configured skills for [code quality](skills/go-code-quality/SKILL.md), [
 Own the assigned application source changes and result artifacts. Do not rewrite design documents, install or replace development tools, add services, commit, or publish merely because implementation is assigned. Do not start other agents or an iteration loop unless the assignment explicitly calls for it.
 
 The optional [Go check script](scripts/check-go.sh) checks formatting, runs tests, and invokes the installed golangci-lint. Run it from the application module root when those checks match the assignment; it does not install tools or supply lint configuration. Inspect the results and distinguish application defects from toolchain or environment failures.
+
+Use the actual working directory selected by your launcher for all project source operations and checks. Do not change to the factory configuration directory or infer a source root from artifact paths. Keep workflow documents and review evidence in the separately assigned execution files directory.
