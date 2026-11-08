@@ -19,19 +19,17 @@ Use a copy of this bundle for a different rubric or question set. Factory pins t
 
 Defaults use OpenRouter's Decisions endpoint and `typesafe/jev-1.14`. Only the OpenRouter decision protocol is supported by this bundle. A custom endpoint can target a gateway implementing that same protocol; it must use HTTPS, except for loopback HTTP test servers. This is not a chat-completions request.
 
-```json
-{
-  "name": "readiness",
-  "path": "/path/to/registry/classifiers/task-readiness",
-  "entrypoint": "start.sh",
-  "overrides": {
-    "provider": "openrouter",
-    "endpoint": "https://openrouter.ai/api/alpha/decisions",
-    "model": "typesafe/jev-1.14",
-    "api_key_env": "OPENROUTER_API_KEY",
-    "admission": {"minimum_probability": 0.85}
-  }
-}
+```yaml
+name: readiness
+path: /path/to/registry/classifiers/task-readiness
+entrypoint: start.sh
+overrides:
+  provider: openrouter
+  endpoint: https://openrouter.ai/api/alpha/decisions
+  model: typesafe/jev-1.14
+  api_key_env: OPENROUTER_API_KEY
+  admission:
+    minimum_probability: 0.85
 ```
 
 The credential value must exist in the **Factory service's environment**, not just a later client terminal. `overrides` contains its variable name, never the secret. Native model/provider configuration for the downstream planning agent is independent of this classifier's configuration.
@@ -62,7 +60,7 @@ Its accepted result has:
 
 The shown bodies are abbreviated, not actual predictions. Runtime data retains every returned body field, including answer probabilities, model metadata and usage. Bodies are preserved as JSON values, not original whitespace or HTTP bytes. Headers and credentials are excluded. The result is sent to the discovered controller participant using MCP and must receive `effect.state: accepted`.
 
-Bind later step inputs to outputs named `request` and `response`. The original bodies remain unchanged in either mode; no feedback envelope or prose template is added. See the [complete factory example](../../factories/golang/factory.json).
+Bind later step inputs to outputs named `request` and `response`. The original bodies remain unchanged in either mode; no feedback envelope or prose template is added. See the [complete factory example](../../factories/golang/factory.yaml).
 
 ## Enforced admission
 

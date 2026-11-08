@@ -19,4 +19,4 @@ The utility refuses unrelated staged changes, unmerged files, an unexpected bran
 
 It never pushes, amends, merges, disables hooks, changes Git identity, or discards working files. Requirements: Python 3 and Git, configured commit identity, and any signing credentials required by the repository.
 
-Use `--workspace` to select the project directory in the prepared worktree while the hook itself starts beside factory.json. The utility verifies worktree ownership and refuses commits after release. Workflow documents in execution storage are not staged by project commits.
+Use `--workspace` to select the project directory in the prepared worktree while the hook itself starts beside factory.yaml. The utility verifies worktree ownership and refuses commits after release. Workflow documents in execution storage are not staged by project commits.

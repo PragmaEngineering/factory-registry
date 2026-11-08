@@ -1,3 +1,4 @@
+import { parse as parseYAML } from 'yaml';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync, realpathSync } from 'node:fs';
@@ -8,7 +9,7 @@ import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 
 const factoryDirectory = fileURLToPath(new URL('../factories/golang/', import.meta.url));
-const factory = JSON.parse(readFileSync(join(factoryDirectory, 'factory.json')));
+const factory = parseYAML(readFileSync(join(factoryDirectory, 'factory.yaml'), 'utf8'));
 
 test('configured Go hooks use one execution worktree and keep documents outside its source commits', t => {
   const parent = mkdtempSync(join(tmpdir(), 'go-worktree-'));

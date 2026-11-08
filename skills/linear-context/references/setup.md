@@ -7,4 +7,4 @@ The optional [Linear context skill](../SKILL.md) describes sourcing and interpre
 3. Export `LINEAR_API_KEY` in the shell that starts the agent. Start a new session so the native MCP configuration is loaded. Do not put credentials in prompts or task artifacts.
 4. Ask for the issue by identifier or URL. The agent discovers the connection's actual read tools and reports missing access.
 
-These starter profiles expose read operations. Writes need a separately configured connection and authorization. `factory.json` does not select or authenticate MCPs; another runner must configure its own Linear connection. See [Linear's documentation](https://linear.app/docs/mcp) for supported authentication.
+These starter profiles expose read operations. Writes need a separately configured connection and authorization. `factory.yaml` does not select or authenticate MCPs; another runner must configure its own Linear connection. See [Linear's documentation](https://linear.app/docs/mcp) for supported authentication.

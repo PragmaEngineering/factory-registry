@@ -89,8 +89,8 @@ test("Factory invokes the agent entrypoint with one prepared profile and complet
   try {
     const executable = path.join(f.root, "fake pi.cjs");
     fakePi(executable);
-    writeJSON(path.join(f.project, "factory.json"), {
-      extends: path.join(f.content, "factories/writing/factory.json"),
+    writeJSON(path.join(f.project, "factory.yaml"), {
+      extends: path.join(f.content, "factories/writing/factory.yaml"),
       defaults: { executable },
     });
     const output = JSON.parse(

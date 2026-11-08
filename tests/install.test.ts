@@ -1,3 +1,4 @@
+import { parse as parseYAML } from "yaml";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -8,9 +9,9 @@ test("external tools load with the external framework with valid member entrypoi
   const installed = await fixture();
   try {
     for (const factory of ["golang", "writing"]) {
-      const definition = json(
-        path.join(installed.content, "factories", factory, "factory.json"),
-      );
+      const definition = parseYAML(fs.readFileSync(
+        path.join(installed.content, "factories", factory, "factory.yaml"), "utf8"
+      ));
       if (factory === "golang") {
         for (const name of ["spec.html", "plan.html"])
           assert.equal(
@@ -447,8 +448,8 @@ test("external tools load with the external framework with valid member entrypoi
       }
     }
     assert.deepEqual(fs.readdirSync(installed.project), []);
-    writeJSON(path.join(installed.project, "factory.json"), {
-      extends: path.join(installed.content, "factories/golang/factory.json"),
+    writeJSON(path.join(installed.project, "factory.yaml"), {
+      extends: path.join(installed.content, "factories/golang/factory.yaml"),
       providers: {
         "team-gateway": {
           baseUrl: "https://gateway.example.test/v1",
@@ -479,8 +480,8 @@ test("external tools load with the external framework with valid member entrypoi
         file.endsWith("/skills/author-spec/SKILL.md"),
       ),
     );
-    writeJSON(path.join(installed.project, "factory.json"), {
-      extends: path.join(installed.content, "factories/golang/factory.json"),
+    writeJSON(path.join(installed.project, "factory.yaml"), {
+      extends: path.join(installed.content, "factories/golang/factory.yaml"),
       agents: [
         {
           name: "coordinator",
@@ -506,8 +507,8 @@ test("external tools load with the external framework with valid member entrypoi
         file.endsWith("/orchestrator/SKILL.md"),
       ),
     );
-    writeJSON(path.join(installed.project, "factory.json"), {
-      extends: path.join(installed.content, "factories/golang/factory.json"),
+    writeJSON(path.join(installed.project, "factory.yaml"), {
+      extends: path.join(installed.content, "factories/golang/factory.yaml"),
       agents: [{ name: "architect", config: { thinking: "high" } }],
     });
     await assert.rejects(

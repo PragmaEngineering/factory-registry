@@ -1,0 +1,47 @@
+name: writing
+owner: coordinator
+agents:
+  - name: pair_writer
+    path: ../../agents/pair_writer
+    entrypoint: start.sh
+    args:
+      - -p
+      - '{prompt}'
+    runtime:
+      name: pi
+      version: =1.0.3
+  - name: architecture_reviewer
+    path: ../../agents/architecture_reviewer
+    entrypoint: start.sh
+    args:
+      - -p
+      - '{prompt}'
+    runtime:
+      name: pi
+      version: =1.0.3
+recipe: README.md
+workflow:
+  start: draft
+  steps:
+    - name: draft
+      type: agent
+      agent: pair_writer
+      title: Develop working draft
+      instructions: Work interactively with the user on the requested document. Preserve decisions and source evidence; submit the draft for feedback.
+      inputs:
+        - task brief
+        - source material
+      outputs:
+        - working draft and decision notes
+      on:
+        completed: feedback
+        ready_for_review: feedback
+        failed: $blocked
+    - name: feedback
+      type: decision
+      actor: human
+      artifacts: []
+      on:
+        approve: $done
+        request_changes: draft
+        reject: $blocked

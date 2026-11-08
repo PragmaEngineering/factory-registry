@@ -38,7 +38,7 @@ The standalone checks verify generated artifacts, references, example criterion 
 
 ## Use the Go coding factory
 
-Keep Factory Workflows and this repository outside the application. Place a complete `factory.json` in the application root. Start from [the Go factory definition](factories/golang/factory.json), then change `packages[].path` and all hook script arguments to paths for this checkout's agents, classifiers, and Git utilities. This factory requires a committed Git base; it creates a separate execution worktree and commits project changes at approved stage boundaries. See [its Git lifecycle](factories/golang/README.md#execution-storage-and-worktrees) before starting it. A library-relative path such as `../../agents/architect` does not remain valid when copied into another project. `factory.json` has no `extends` mechanism.
+Keep Factory Workflows and this repository outside the application. Place a complete `factory.yaml` in the application root. Start from [the Go factory definition](factories/golang/factory.yaml), then change `packages[].path` and all hook script arguments to paths for this checkout's agents, classifiers, and Git utilities. This factory requires a committed Git base; it creates a separate execution worktree and commits project changes at approved stage boundaries. See [its Git lifecycle](factories/golang/README.md#execution-storage-and-worktrees) before starting it. A library-relative path such as `../../agents/architect` does not remain valid when copied into another project. `factory.yaml` has no `extends` mechanism.
 
 From the application root:
 
@@ -52,13 +52,13 @@ factory inbox
 
 See the [Go factory guide](factories/golang/README.md) for its workflow and the [Factory CLI guide](../controls/README.md) for status, decisions, messages, and retries. The [GO-001 eval guide](../evals/README.md) documents repeatable execution setup and measurement.
 
-The bundled Pi profiles currently default to OpenRouter. Provide the configured provider credential through the environment; never put API keys in `factory.json`. Enabled MCPs and extensions may require additional host tools. The local Factory command runner executes agents with the host user's permissions, so use trusted bundles.
+The bundled Pi profiles currently default to OpenRouter. Provide the configured provider credential through the environment; never put API keys in `factory.yaml`. Enabled MCPs and extensions may require additional host tools. The local Factory command runner executes agents with the host user's permissions, so use trusted bundles.
 
 
 
 ## Optional Git lifecycle skills
 
-The deterministic Git hook utilities live in [scripts/](scripts/): [worktree preparation/release](scripts/git-worktree.py) and [commits](scripts/git-commit.py). The [Git worktree](skills/git-worktree/SKILL.md) and [Git commit](skills/git-commit/SKILL.md) skills document their use; the utilities do not depend on loading either skill. Configure them as execution and stage hooks in a project's `factory.json`; the controller invokes the scripts without relying on an agent to remember lifecycle commands. Use an execution after hook to release the execution worktree receipt while retaining its files and branch.
+The deterministic Git hook utilities live in [scripts/](scripts/): [worktree preparation/release](scripts/git-worktree.py) and [commits](scripts/git-commit.py). The [Git worktree](skills/git-worktree/SKILL.md) and [Git commit](skills/git-commit/SKILL.md) skills document their use; the utilities do not depend on loading either skill. Configure them as execution and stage hooks in a project's `factory.yaml`; the controller invokes the scripts without relying on an agent to remember lifecycle commands. Use an execution after hook to release the execution worktree receipt while retaining its files and branch.
 
 The committer generates a configured Conventional Commit subject and execution/multi-agent identity trailers without a model. It requires explicit commit paths, preserves repository hooks/signing, detects duplicate effects, and never publishes changes. Preparation uses a committed base and leaves the source checkout unchanged; uncommitted source changes are not included. These optional utilities require Python 3.9+ and Git on a Unix host. Read the [Controls hook contract](../controls/docs/hooks.md) before enabling them. Agent bundles can link these canonical skills when Git guidance is useful; no skills are copied into agents automatically.
 
@@ -95,7 +95,7 @@ For discovery by an installed Pi, set `PI_SKILL_LOADER` to that installation's `
 
 ## Execution documents
 
-With Controls, `factory_dir` defaults to `.factory` beside factory.json. Specs, plans and review evidence belong to its execution-specific `files/` directory; source stays in the workspace selected by the launcher. No files-directory environment variable is required. [Configuration and references](../controls/docs/execution-files.md) define the directory and argument contract. Go agent entrypoints accept an optional leading `--workspace DIRECTORY`; remaining options pass unchanged to Pi.
+With Controls, `factory_dir` defaults to `.factory` beside factory.yaml. Specs, plans and review evidence belong to its execution-specific `files/` directory; source stays in the workspace selected by the launcher. No files-directory environment variable is required. [Configuration and references](../controls/docs/execution-files.md) define the directory and argument contract. Go agent entrypoints accept an optional leading `--workspace DIRECTORY`; remaining options pass unchanged to Pi.
 
 ## Native runtime integration
 
