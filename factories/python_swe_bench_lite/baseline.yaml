@@ -1,0 +1,49 @@
+# Repository preparation and official grading are external integration work.
+# This host-runner configuration is not a sandbox or a complete benchmark harness.
+name: python-swe-bench-lite-single
+factory_dir: .factory
+variables:
+  # Must already contain the instance repository at its declared baseline.
+  workspace: ${execution.project}/workspace
+packages:
+  - name: coder
+    path: ../../agents/coder_python
+    entrypoint: start.sh
+    args:
+      - --workspace
+      - ${variables.workspace}
+      - -p
+      - '{prompt}'
+    runtime:
+      name: pi
+      version: =1.0.3
+    overrides:
+      provider: openrouter
+      model: deepseek/deepseek-v4-flash
+      base_url: https://openrouter.ai/api/v1
+      api: openai-completions
+      api_key_env: OPENROUTER_API_KEY
+      thinking: medium
+workflow:
+  start: implement
+  steps:
+    - name: implement
+      type: run
+      package: coder
+      title: Repair and self-review the reported issue
+      instructions: >-
+        Repair the issue in the launcher-selected workspace. Reproduce the defect where possible, implement a focused fix and regression test, then run relevant project checks and self-review the candidate. Record changes, commands, results and limits in reviews/implementation.md under the assigned execution files directory. Return completed when the candidate is ready for external grading. Use only the supplied issue, baseline source and permitted local tools. Do not search online for the issue solution, inspect future commits, read benchmark datasets/reference patches/private tests, or run the official grader. Do not ask for human input, commit, install tools or launch other agents. Preserve project conventions. Return blocked with concrete evidence if the environment or requirements prevent progress. Local checks are not an official benchmark score.
+      input_bindings:
+        task:
+          execution: input
+      outputs:
+        - reviews/implementation.md
+      outputs_on:
+        - completed
+      budget:
+        tokens: 200000
+        elapsed_seconds: 2400
+        action: stop
+      on:
+        completed: $done
+        blocked: $blocked

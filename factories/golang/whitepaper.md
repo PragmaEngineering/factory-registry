@@ -6,7 +6,7 @@ Empirical systems manuscript — internal draft, 8 November 2026.
 
 ## Abstract
 
-Pragma runs configurable software-development workflows and records their execution. We describe its control plane and a workflow with author/reviewer pairs, bounded review loops and human approvals. We test whether explicit execution rules and collaboration policies improve reliability and resource efficiency. The evaluation combines fault tests with independently graded benchmarks: [[BENCHMARK_RELEASES_AND_COHORTS]], covering [[UNIQUE_TASK_COUNT]] tasks and [[TRIAL_COUNT]] trials under [[BUDGET_AND_HUMAN_POLICY]]. Against [[BASELINE]], [[PRIMARY_CORRECTNESS_RESULT_WITH_UNCERTAINTY]]. Resource and reliability results are [[RESOURCE_AND_RELIABILITY_RESULTS_WITH_UNCERTAINTY]]. These findings [[SUPPORTED_INTERPRETATION]], subject to [[PRINCIPAL_EMPIRICAL_LIMITATIONS]].
+Pragma runs configurable software-development workflows and records their execution. We describe its control plane and autonomous Python benchmark variants with bounded author/reviewer loops. We compare a single coding agent with a sequential author/reviewer workflow on SWE-bench Lite, and test control-plane reliability separately. The evaluation combines fault tests with official grading on [[BENCHMARK_RELEASES_AND_COHORTS]], covering [[UNIQUE_TASK_COUNT]] tasks and [[TRIAL_COUNT]] trials without human intervention under [[TOTAL_BUDGET_POLICY]]. Against [[BASELINE]], [[PRIMARY_CORRECTNESS_RESULT_WITH_UNCERTAINTY]]. Resource and reliability results are [[RESOURCE_AND_RELIABILITY_RESULTS_WITH_UNCERTAINTY]]. These findings [[SUPPORTED_INTERPRETATION]], subject to [[PRINCIPAL_EMPIRICAL_LIMITATIONS]].
 
 ## 1. Introduction
 
@@ -14,13 +14,13 @@ A coding agent's results depend on more than its model. Instructions, repository
 
 We make these choices explicit, version them, and compare their effects on defined tasks. The central research question is:
 
-> Can explicit execution contracts and configurable collaboration policies make multi-agent software engineering more reliable and resource-efficient than less constrained coordination?
+> Does an author/reviewer workflow resolve more SWE-bench Lite issues than a single coding agent under the same total budget?
 
 Execution contracts define who may act, how work is accepted as complete, and how delivery and recovery work. Collaboration policies define assignments, information flow, review loops and human involvement. The control plane enforces these rules; benchmarks measure the resulting work.
 
-The comparison needs a concrete baseline, such as a model-directed planner with peer discussion. Such a planner may adapt to unfamiliar problems better than a fixed workflow. We therefore compare outcomes under declared budgets and human-intervention rules.
+The baseline is a single coding agent. The treatment adds explicit author/reviewer roles and bounded revision loops. Both use the same control plane. This comparison tests the workflow, not the causal benefit of the control plane itself.
 
-Pragma combines established practices: declarative workflows, independent review, bounded iteration and executable checks. It introduces no new orchestration algorithm. We describe both the control plane and the Go workflow because both affect the results.
+Pragma combines established practices: declarative workflows, independent review, bounded iteration and executable checks. It introduces no new orchestration algorithm. We describe both the control plane and the Python repair workflow because both affect the results.
 
 The paper makes three contributions:
 
@@ -45,7 +45,7 @@ Anemoi is direct prior art. Its planner initiates work; specialized agents refin
 | Dimension | Anemoi as described | Pragma's present configuration |
 | --- | --- | --- |
 | Execution authority | Planner-led initiation and agent negotiation of the evolving plan | Declared routes, loop rules and human gates enforced by the controller |
-| Worker communication | Direct discussion through MCP threads | Execution-scoped MCP threads; the Go workflow currently uses sequential handoffs |
+| Worker communication | Direct discussion through MCP threads | Execution-scoped MCP threads; the Python repair workflow currently uses sequential handoffs |
 | Criticism | Dedicated critique participant in the discussion | Explicit architecture and code reviewer assignments |
 | Terminal boundary | Participant consultation/consensus followed by answer submission | Accepted typed invocation result, then configured routing |
 | Evaluation domain | General-assistant tasks on GAIA | Repository-level software engineering; exact evaluated cohorts are specified in Section 6 |
@@ -74,7 +74,7 @@ Anthropic recommends targeted retrieval and compact retained context. We test ex
 
 ### 2.5 Evaluation and developer productivity
 
-SWE-bench tests issue resolution in existing repositories. Its original Python tasks provide a precedent for repository-level evaluation, not a baseline for the Go factory. ([Jimenez et al., ICLR 2024](https://arxiv.org/abs/2310.06770))
+SWE-bench tests issue resolution in existing repositories. Lite selects a smaller set of its Python tasks for more affordable evaluation. ([Jimenez et al., ICLR 2024](https://arxiv.org/abs/2310.06770))
 
 Agent-evaluation guidance separates interaction traces from outcomes, and executable grading from model or human judgment. We likewise distinguish accepted completion from product correctness. ([Anthropic, 2026](https://www.anthropic.com/research/demystifying-evals-for-ai-agents))
 
@@ -86,17 +86,15 @@ This selective review informs our design and comparisons. The study tests execut
 
 We study the control plane and the participant workflow. Fault tests check the control plane’s contracts; software benchmarks assess the product built by the complete system, including its models, tools and environment.
 
-| Question | Intervention or comparison | Required evidence |
+| Question | Comparison | Evidence |
 | --- | --- | --- |
-| RQ1: Does the control plane preserve its execution and communication contracts under faults? | Fixed workflow with controlled message replay, malformed completion, process interruption and recovery cases | Accepted-result identity, durable receipts, duplicate-effect checks, routing, visible failure state and recovery bounds |
-| RQ2: Does evidence-driven repair improve convergence? | Explicit finding/response/verification contract versus current narrative handoff | Verified product outcome, unresolved/reopened findings, review iterations, tokens and human interventions |
-| RQ3: Can overlapping design and review reduce elapsed time without reducing quality? | Sequential versus concurrent design under matched budgets and requirements | Consistent final document revisions, product checks, elapsed time, aggregate agent effort and coordination failures |
-| RQ4: Does targeted context reduce resource use without losing necessary information? | Targeted retrieval and compact handoffs versus the existing context policy | Acceptance outcome, missed requirements, retrieval failures and token categories |
-| RQ5: Is admission useful? | Current classifier threshold versus advisory or alternative policy | Human-labeled actionability, false blocks, overrides and downstream missing-context failures |
+| RQ1: Does author/reviewer coordination improve issue resolution? | Single coding agent versus sequential author/reviewer workflow, with matched total budgets and human policy | Official per-instance grades and paired differences |
+| RQ2: What does review cost? | The same variants and tasks | Tokens, known cost, elapsed time, aggregate agent duration and human effort, interpreted alongside correctness |
+| RQ3: Does the control plane honor its contracts under faults? | Deterministic fixtures for duplicate messages, invalid completion, interruption and bounded recovery | Invariant violations and recovery outcomes, reported separately from benchmark scores |
 
 Measure reliability and product correctness separately. Lower token use is useful only in relation to product quality. Fewer reported findings do not establish convergence, and faster completion must not conceal skipped checks or extra human work.
 
-The Go factory is the reference implementation, not a language restriction. Other languages and task types require suitable worker configurations. This study evaluates [[EVALUATED_LANGUAGES_AND_PACKAGE_VARIANTS]]. It does not measure organization-wide productivity or production security.
+The study targets SWE-bench Lite’s full 300-task Python test split. The autonomous packages are [[EVALUATED_LANGUAGES_AND_PACKAGE_VARIANTS]]. Conclusions are limited to repository issue resolution, not general-assistant performance or developer productivity.
 
 ## 4. Part I — The Factory Control Plane
 
@@ -186,89 +184,88 @@ Maintain separate records for:
 
 A planned check, an agent's claim, a retained tool result and an independent reviewer execution are different evidence classes. Reused evidence must still apply to the submitted revision. A published artifact's digest identifies bytes, not their correctness.
 
-## 5. Part II — The Configured Go Development Workflow
+## 5. Part II — The Python Issue-Repair Workflow
 
-The [factory definition](factory.yaml) configures admission, two author/reviewer pairs, human decisions and lifecycle hooks. Section 6 records the variants tested and their differences from this reference workflow.
+The [Python factory](../python_swe_bench_lite/README.md) targets existing-repository
+bug fixes. It uses the supplied issue and source baseline directly, without requiring
+separate specification or plan documents. Its two configurations define the study
+variants; the older human-reviewed Go workflow is not the benchmark treatment.
 
 ```mermaid
 flowchart TD
-    Input[Captured request] --> Prepare[Optional lifecycle utility: prepare source worktree]
-    Prepare --> Admission[Readiness classification]
-    Admission -->|admitted| Design[Architect writes spec and plan]
-    Admission -->|review_required| Override{Human admission decision}
-    Override -->|approve| Design
-    Override -->|reject| Blocked[Blocked]
-    Design --> ReviewDesign[Architecture review]
-    ReviewDesign -->|repeat within limit| Design
-    ReviewDesign -->|ready or limit reached| DesignGate{Human design decision}
-    DesignGate -->|request changes| Design
-    DesignGate -->|approve and stage hook succeeds| Build[Go implementation]
-    Build --> ReviewCode[Code review]
-    ReviewCode -->|repeat within limit| Build
-    ReviewCode -->|ready or limit reached| Acceptance{Human acceptance}
-    Acceptance -->|request changes| Build
-    Acceptance -->|approve and lifecycle hooks succeed| Completed[Completed]
+    Input[Issue and prepared repository baseline] --> Coder[Python coder: investigate, repair, test]
+    Coder -->|ready_for_review| Review[Independent Python code review]
+    Coder -->|blocked| Blocked[Failed execution: retain available evidence]
+    Review -->|completed| Candidate[Candidate ready for external grading]
+    Review -->|changes_requested, below limit| Coder
+    Review -->|blocked or limit exhausted| Blocked
+    Candidate --> Export[Public candidate export — integration pending]
+    Blocked --> Export
+    Export --> Grade[Official grader in fresh environment — integration pending]
 ```
 
-Failure/rejection routes are abbreviated. A provider error, hook failure or rejected artifact can block progression independently of technical review. Loop-limit escalation can reach a human with unresolved findings; it does not mean the reviewer recommended acceptance.
+The single-agent baseline performs implementation and self-review in one invocation.
+The treatment uses a separate reviewer and allows at most two coder/reviewer rounds.
+Both are autonomous: no admission override, human approval or discretionary rescue.
+The controller routes accepted outcomes; there is no additional planning model.
 
-### 5.1 Participants and handoffs
+### 5.1 Participants and evidence
 
-| Participant | Assignment and owned output | Review / handoff |
+| Participant | Owns | Handoff |
 | --- | --- | --- |
-| Task-readiness classifier | Classify the captured task against the configured actionability policy | Assessment routes to admission or human review; it is not a planning agent |
-| Architect | Inspect the task/project; author `spec.html` and `plan.html` | Receives task/readiness context and architecture-review feedback |
-| Architecture reviewer | Independently assess the current spec/plan; record stable findings in `reviews/architecture.md` | Requests architect changes or reports readiness for the human design gate |
-| Go coder | Implement the approved design in the selected source workspace; report actual checks and limitations | Receives the planning artifacts and code-review feedback |
-| Go code reviewer | Inspect the submitted implementation and evidence; independently verify relevant behavior | Requests coding changes or reports readiness for human acceptance |
-| Human operator | Resolve admission exceptions, approve/request design changes and accept/request implementation changes | Decisions are recorded control inputs; participation makes a run assisted |
+| Python coder | Source changes, local regression tests and implementation evidence | Returns a candidate for review, or a concrete blocker |
+| Python reviewer | Independent inspection, focused checks and findings; does not edit source | Accepts review readiness or requests specific repairs |
+| Official evaluator | Independent application of the candidate patch and benchmark grading | Produces per-instance results after the agent attempt; integration pending |
 
-Worker packages supply role instructions, skills, tools and native settings. The factory assigns packages to steps and can override supported model/provider settings. Planning skills define document structure; Go tools support implementation checks; the communication skill defines messaging. Record package and skill revisions alongside the factory configuration. ([Agent library](../../agents/README.md); [workflow and skill configuration](README.md))
+Both agents link to the shared Python repair skill, which follows each repository’s
+interpreter, dependency and test conventions. The reviewer also uses critical-review
+guidance. Neither assumes that all projects use pytest or permits upgrading dependencies
+to hide a failing check. Worker instructions prohibit reference-solution lookup, but
+runtime isolation is required to enforce that boundary.
 
-In this **sequential** workflow, reviewers return findings before the author runs again. Concurrent review requires a different configuration, with explicit ownership, revision and completion rules.
+The coder records commands, results and limitations in `reviews/implementation.md`;
+the reviewer records findings in `reviews/code.md`. These live in execution storage,
+separate from source changes. Findings keep stable IDs across rounds. The coder
+responds with repairs or counterevidence; the reviewer checks the changed code.
+A clean review means no material defect was found in that review, not an official pass.
 
 ### 5.2 Configured choices
 
-| Setting | Current configuration | Role in the study |
+| Setting | Baseline | Author/reviewer treatment |
 | --- | --- | --- |
-| Admission | Jev `accept` probability at least `0.85`, otherwise human review | An uncalibrated policy to evaluate, not a correctness guarantee |
-| Design | Architect plus architecture reviewer; sequential, limit 3 | Candidate baseline for evidence and concurrency experiments |
-| Implementation | Go coder plus code reviewer; sequential, limit 3 | Separates authoring from review responsibility |
-| Human policy | Design approval and final acceptance; admission override when needed | Must distinguish normal checkpoints from technical recovery |
-| Native runtime | Explicit Pi requirement `=1.0.3` | Version compatibility is part of the execution environment |
-| Models | OpenRouter / DeepSeek V4 Flash for agents; Jev for admission | Per-role choices, not methodological requirements |
-| Model settings | High thinking for architect/reviewers; medium for coder | Experimental parameters; current choices are not proven optimal |
-| Lifecycle | Worktree preparation, approved-stage commits, retained checkout | Workspace and provenance utilities through generic hooks |
+| Configuration | `baseline.yaml` | `factory.yaml` |
+| Participants | Python coder | Same coder plus Python reviewer |
+| Iteration | One invocation with self-review | Sequential, at most two rounds |
+| Human involvement | None | None |
+| Native runtime | Pi 1.0.3 | Pi 1.0.3 |
+| Model defaults | OpenRouter / DeepSeek V4 Flash; medium thinking | Same for both roles |
+| Starter per-attempt limits | 200,000 reported tokens; 2,400 seconds | 50,000 tokens; 600 seconds per member |
+| Source setup | Preprovisioned instance workspace | Same requirement |
 
-The classifier receives the captured task and does not inspect source. Human admission approval overrides its assessment rather than rerunning it. The architect receives the original request/response. Preparation currently precedes admission, so rejected requests can still incur workspace setup.
+The starter limits give the same nominal maximum of 200,000 tokens and 2,400 agent
+seconds without retries. They allocate resources differently: the pair may finish
+early and cannot transfer unused step allowances. Token enforcement depends on
+reported usage and may overshoot by one response. These are development defaults,
+not measured optimal settings or a guarantee of equal cost. Freeze the actual study
+budgets and allocation after development trials; report them in Section 6.
 
-The architect owns `spec.html` and `plan.html`; reviewers own findings; the coder owns source changes. Workflow documents reside in execution evidence storage, separate from the source worktree. Stage hooks commit project changes after human approval; the design hook normally has no source changes to commit. Release retains the worktree rather than merging or pushing.
+Review-limit exhaustion fails the execution. It does not imply reviewer acceptance,
+and it must not silently discard a candidate from grading. The pending output contract
+must preserve candidates and evidence from failed or budget-exhausted executions when
+available. Local workflow state and official correctness remain separate measurements.
 
-Git worktrees separate checkout state while sharing repository data. They provide neither a security sandbox nor an independent backup. ([Git, worktree reference](https://git-scm.com/docs/git-worktree)) Proposed mountable execution volumes are separate work and are not implemented in this factory.
+### 5.3 Configuration and integration status
 
-### 5.3 Configuration as an experimental record
+The [factory and baseline](../python_swe_bench_lite/README.md) and Python worker bundles
+are implemented. The current host runner does not provide benchmark isolation,
+instance provisioning, public patch export or official grading. Those integrations
+are recorded in [Registry](../../bench_issues.md), [Controls](../../../controls/bench_issues.md)
+and [Bench](../../../bench/bench_issues.md). No benchmark score is implied by loading
+a configuration or passing its contract tests.
 
-Record the factory definition, resolved configuration digest, packages, runtimes, source baseline, toolchain, inputs and human-intervention policy. A factory name is insufficient to reproduce a run. Hosted models may still change despite pinned configuration.
-
-See the [factory README](README.md), [configuration reference](../../../controls/docs/factory-yaml.md), [package contract](../../../controls/docs/packages.md), [runtime guide](../../../controls/docs/runtime-adapters.md), and [hook contract](../../../controls/docs/hooks.md) for setup and field definitions.
-
-### 5.4 Evidence-driven review and repair
-
-```mermaid
-flowchart LR
-    Finding[Reviewer finding tied to a revision] --> Response[Author repair or counterevidence]
-    Response --> Verify[Reviewer checks submitted revision and evidence]
-    Verify -->|still open| Response
-    Verify -->|resolved or withdrawn with reason| Record[Retain assessment and limitations]
-```
-
-Each finding states the defect, trigger, evidence, impact and required correction. The author responds under the same finding ID, identifying changes and checks. The reviewer verifies the repair or withdraws an incorrect finding. Human acceptance of remaining risk does not resolve a technical defect.
-
-A design inconsistency may be established through conflicting interfaces or a concrete failure sequence; not every finding requires an executable test. A cancellation defect may require a focused regression check. Go contexts communicate cancellation through a call chain; they do not forcibly terminate arbitrary goroutines. Verification must exercise the affected blocking operation and cleanup. ([Go, context overview](https://pkg.go.dev/context#pkg-overview))
-
-The existing skills already require stable findings and evidence. [GOLANG-001](issues.md) proposes consistent representation and closure across handoffs; it has not introduced a new runtime protocol or an implemented repair ledger.
-
-For Go, select relevant formatting, compile/vet/lint, behavioral, integration, race or fuzz checks. Race detection covers exercised paths, not all possible schedules or unexecuted code. ([Go, Data Race Detector](https://go.dev/doc/articles/race_detector)) Fuzzing explores inputs and can retain failing cases; it requires a meaningful property and a bounded run. ([Go, fuzzing tutorial](https://go.dev/doc/tutorial/fuzz)) Line coverage does not establish that assertions distinguish correct from incorrect behavior. ([Bender, Testing Overview](https://abseil.io/resources/swe-book/html/ch11.html))
+Record the actual configuration digest, package/skill revisions, adapter, model,
+source baseline, environment and budgets for every trial. A stable model name does
+not guarantee a hosted provider remains unchanged.
 
 ## 6. Experimental Setup and Method
 
@@ -283,74 +280,21 @@ We compare the following aspects of the system. An end-to-end result alone canno
 
 Fault tests check infrastructure behavior; coding benchmarks check software outcomes. Neither substitutes for the other.
 
-### 6.1 Benchmarks
+### 6.1 SWE-bench Lite
 
-The table below identifies the tasks used in this study. The broader benchmark inventory is related work, not the study sample.
+The first study uses **SWE-bench Lite**, which tests issue resolution in existing repositories. Its introducing release contains 300 tasks from Python repositories. Each task supplies an issue and a repository baseline. The official grader applies the candidate patch and checks both issue-specific fixes and existing behavior. ([Benchmark description](https://www.swebench.com/lite.html); [official evaluation guide](https://www.swebench.com/SWE-bench/guides/evaluation/))
 
-| Study ID | Benchmark / exact release | Dataset revision and split | Languages | Unique tasks | Selection / exclusions | Research questions |
-| --- | --- | --- | --- | ---: | --- | --- |
-| [[STUDY_ID]] | [[BENCHMARK_RELEASE]] | [[REVISION_SPLIT]] | [[LANGUAGES]] | [[N_TASKS]] | [[COHORT_RULE_AND_EXCLUSIONS]] | [[RQ_IDS]] |
+Lite is a selected subset of the original SWE-bench, distinct from Verified and Multilingual. We do not pool their scores. GAIA, Terminal-Bench and longer-horizon benchmarks remain related work, not evaluation targets for this paper. The broader [benchmark literature survey](benchmark-survey.md) is retained as background.
 
-Retain exact instance IDs, selection date, development/test split, licenses and environment/grader revisions. Label all subsets.
+| Study | Dataset revision / split | Languages | Unique tasks | Selection / exclusions | Development tasks excluded |
+| --- | --- | --- | ---: | --- | --- |
+| [[STUDY_ID]] | [[REVISION_SPLIT]] | [[LANGUAGES]] | [[N_TASKS]] | [[COHORT_RULE_AND_EXCLUSIONS]] | [[DEVELOPMENT_INSTANCE_IDS]] |
 
-Choose benchmarks for the research question. Repository repair, terminal operation and proposal assessment test different abilities. Adapting the Go factory to another task changes the experimental configuration.
+The target cohort is the full 300-task test split at a pinned revision, with no Go-only filter. Freeze the test manifest and use Lite’s separate 23-task dev split or deterministic fixtures for integration and tuning. If test tasks are exposed during development, disclose that exposure rather than describing them as held out. Missing or failed trials remain in the inventory; they do not silently shrink the cohort.
 
-#### Publication-count method
+Pin the dataset commit, evaluator revision, source baselines, environment images and attempt budgets. Keep reference patches, test patches and grader feedback outside the agent phase. Use the official grader in a fresh environment and retain its per-instance results. ([Dataset](https://huggingface.co/datasets/SWE-bench/SWE-bench_Lite); [evaluation harness](https://github.com/SWE-bench/SWE-bench))
 
-This inventory records publications verified as of **8 November 2026**. We count benchmark introductions with evaluations, original empirical uses, audits and studies of identified derivatives. Citations, copied scores and leaderboard entries alone do not qualify. Versions of one paper count once; project articles are listed separately.
-
-Counts are **lower bounds for the listed publications**, not worldwide adoption estimates. Papers can appear in several rows; do not sum the rows. Introductions, audits and derivative studies are distinguished from independent use. The SWE-bench family row groups publications, not scores.
-
-| Benchmark or release family | What it measures / relevance | Research publications verified here | Origin versus subsequent use |
-| --- | --- | ---: | --- |
-| **SWE-bench / Lite / Verified family** | Existing-repository issue resolution. Strong initial candidate for external comparison if the factory is configured for the selected language and exact split. | **7**: B01–B07 | 1 introduction; 6 subsequent agent/model studies or technical reports. Original, Lite and Verified scores remain separate. |
-| **SWE-bench Verified specifically** | Human-filtered Python issue-resolution tasks; suitable for an autonomous repository-repair baseline. | **3**: B05, B06, B07 | All 3 are subsequent model studies/reports with explicit Verified results. This is a subset of the family inventory, not 3 additional papers. |
-| **[SWE-bench Multilingual](https://www.swebench.com/multilingual.html)** | Cross-language repository repair; includes Go but does not require restricting evaluation to it. | **1**: B07; **plus 1 project publication**: N01 | 1 subsequent model technical report; N01 is the introducing project article, not counted as a research paper. |
-| **Multi-SWE-bench** | Issue resolution across seven languages, with 1,632 instances in the introducing release. Distinct from SWE-bench Multilingual. | **1**: B08 | Introducing paper with baseline evaluations; additional empirical uptake is not quantified by this inventory. |
-| **SWE-bench-Live** | Refreshed issue-resolution tasks; relevant to temporal robustness. Freeze an exact release and language split for repeated studies. | **1**: B09 | Introducing paper with agent/model evaluations; later multilingual project releases are not silently treated as the same evaluated split. |
-| **SWE-rebench / V2** | Fresh evaluation cohorts and executable task collection; relevant to contamination and environment preparation. | **2**: B10, B11 | Two originating works: B10 evaluates the original benchmark; B11 studies multilingual dataset/environment construction. This does not establish 2 independent uses of one held-out benchmark. |
-| **SWE-Bench Pro, original** | Longer-horizon repository work; candidate for testing planning and review under larger changes. | **3**: B12, B13, B17 | 1 introduction; 2 subsequent studies audit or re-evaluate the original benchmark. Audits are not counted as independent factory comparisons. |
-| **SWE-Bench Pro V2** | Revised tasks and evaluation restrictions. Consider separately from original Pro. | **1**: B13 | V2 introduction/re-evaluation; no further independent V2 publication is claimed here. |
-| **Terminal-Bench 2.0 / 2.1 research** | Terminal-based tasks with environment-level verification; useful beyond code patching and across languages. | **5**: B07, B14, B15, B16, B18 | 1 introduction; 2 agent/model/optimizer evaluations; 1 maintenance audit introducing 2.1; 1 modified-starting-state study. Subsets and altered starting states must be labeled. |
-| **DeepSWE** | Original long-horizon repository tasks; potentially relevant to sustained planning/implementation. Confirm artifact access and exact version before selecting. | **2**: B17, B18 | 1 introduction; 1 derivative starting-state study. Does not establish two comparable evaluations of the unmodified full benchmark. |
-| **SWE-Lancer** | Freelance engineering and selection among technical proposals; relevant to broader implementation and decision workflows. | **1**: B19 | Introducing paper with evaluations. Proposal-selection results are distinct from implementation results; payout-based scoring is not measured productivity. |
-
-#### Publication inventory and evidence locations
-
-| ID | Publication | Empirical use verified for the counts above |
-| --- | --- | --- |
-| B01 | [Jimenez et al., *SWE-bench*, ICLR 2024](https://arxiv.org/abs/2310.06770) | Introduces and evaluates repository issue resolution on original SWE-bench. |
-| B02 | [Yang et al., *SWE-agent*, 2024](https://arxiv.org/abs/2405.15793v3) | Reports SWE-bench experiments; abstract and evaluation section. Not assigned to Verified solely from later project leaderboards. |
-| B03 | [Xia et al., *Agentless*, 2024](https://arxiv.org/abs/2407.01489v2) | Reports SWE-bench Lite results and analyzes a filtered Lite-S variant. Lite-S is not the original Lite score. |
-| B04 | [Wang et al., *OpenHands*, ICLR 2025](https://arxiv.org/abs/2407.16741v3) | Software-engineering evaluation includes SWE-bench; counted at family level, not asserted to use Verified. |
-| B05 | [Wei et al., *SWE-RL*, NeurIPS 2025](https://arxiv.org/abs/2502.18449v2) | Explicit SWE-bench Verified model evaluation; abstract and main results. |
-| B06 | [Yang et al., *Kimi-Dev*, 2025](https://arxiv.org/abs/2509.23045v3) | Explicit SWE-bench Verified evaluations of workflow and agent settings. |
-| B07 | [DeepSeek-AI, *DeepSeek-V3.2*, 2025 technical report](https://arxiv.org/html/2512.02556v1#S4) | Main-results table and Appendix C report SWE Verified, SWE Multilingual and Terminal-Bench 2.0. These are model-author measurements, not independent replication. |
-| B08 | [Zan et al., *Multi-SWE-bench*, 2025](https://arxiv.org/abs/2504.02605) | Introduces the benchmark and evaluates Agentless, SWE-agent and OpenHands. Multiple baselines in one paper count as one publication. |
-| B09 | [Zhang et al., *SWE-bench Goes Live!*, 2025](https://arxiv.org/abs/2505.23419v2) | Introduces and evaluates SWE-bench-Live; agent/model experiments in the original release. |
-| B10 | [Badertdinov et al., *SWE-rebench*, 2025](https://arxiv.org/abs/2505.20411v2) | Introduces fresh task collection and agent evaluation. A dated evaluation cohort is not the entire released training corpus. |
-| B11 | [*SWE-rebench V2: Language-Agnostic SWE Task Collection at Scale*, 2026](https://arxiv.org/html/2602.23866v2#S4) | Empirical construction, setup and quality-filter experiments; classified as dataset-construction evidence, not independent adoption of a fixed held-out test set. |
-| B12 | [Deng et al., *SWE-Bench Pro*, 2025](https://arxiv.org/abs/2509.16941v2) | Introduces long-horizon tasks and evaluates models under a common scaffold. |
-| B13 | [*SWE-Bench Pro V2: A Cleaner, Harder-to-Game Coding Benchmark*, 2026](https://arxiv.org/abs/2610.24206) | Audits/revises original Pro and evaluates a modified task set/protocol. Counted as original-Pro audit and V2 introduction, not interchangeable scores. |
-| B14 | [Merrill et al., *Terminal-Bench*, 2026](https://arxiv.org/abs/2601.11868) | Introduces the 89-task Terminal-Bench 2.0 release and evaluates models/agents. |
-| B15 | [Wang, Kattakinda and Feizi, *Do Agent Optimizers Compound?*, 2026](https://arxiv.org/abs/2607.14004) | Evaluates optimizer treatments using hard Terminal-Bench 2.0 tasks under matched optimization budgets; subset/continual-learning protocol. |
-| B16 | [Buchanan et al., *Benchmarks as Software*, 2026](https://arxiv.org/abs/2611.08417) | Audits Terminal-Bench 2.0, releases repairs as 2.1 and evaluates sensitivity to resource budgets; maintenance study. |
-| B17 | [Huang et al., *DeepSWE*, 2026](https://arxiv.org/abs/2607.07946) | Introduces/evaluates DeepSWE and reports an audit of original SWE-Bench Pro verification; distinct types of empirical use. |
-| B18 | [Li et al., *SWE-Residual*, 2026](https://arxiv.org/html/2610.25899#S5) | Evaluates clean and inherited-work states derived from DeepSWE and Terminal-Bench; a task-state transformation, not an unchanged leaderboard protocol. |
-| B19 | [Miserendino et al., *SWE-Lancer*, 2025](https://arxiv.org/abs/2502.12115v4) | Introduces freelance implementation and managerial proposal-selection evaluations. |
-| N01 | [Khandpur et al., SWE-bench Multilingual project article](https://www.swebench.com/multilingual.html) | Introduces the dataset and reports SWE-agent baseline results. Project publication; excluded from research-paper counts. |
-
-The inventory contains **19 research papers/technical reports and one project article**. It is not a systematic review or popularity ranking.
-
-#### Selection and comparability
-
-Report repository repair and terminal tasks separately. A selected language subset does not establish full multilingual performance.
-
-Pin dataset version, instance IDs, environment image, test/verification artifacts, network rules, runtime/model, task and attempt budgets, and intervention policy. Keep hidden tests, reference patches and grader feedback unavailable during the agent phase as the official protocol requires. Do not silently rewrite benchmark inputs into a different task. Follow the benchmark's rules for output extraction and clean-environment grading.
-
-Separate human-assisted and autonomous runs. Declare gates, extra context, repair hints and discretionary retries. To test whether planning and review justify their cost, compare matched budgets; label any unconstrained comparison separately.
-
-Version identity is substantive: Pro V2 changes its evaluation protocol, and the Terminal-Bench maintenance study introduces 2.1 repairs. Original and revised scores cannot be pooled under a generic benchmark label. A benchmark harness or grading backend must integrate through a supported control-plane contract; the eval client still must not reach into worker directories or product workspaces. ([Pro V2 study](https://arxiv.org/abs/2610.24206); [Buchanan et al., 2026](https://arxiv.org/abs/2611.08417))
+Both study variants are autonomous: no human approvals, repair hints or discretionary retries. Unexpected requests for human help follow a declared terminal policy. Any intervention is a protocol deviation, reported separately. Unexpected human requests are recorded as blockers, not auto-approved.
 
 ### 6.2 Variants and procedure
 
@@ -361,9 +305,9 @@ Each trial runs one system variant on one benchmark instance. A variant includes
 | [[BASELINE_ID]] | [[REVISIONS]] | [[CONFIG_DIGEST]] | [[BASELINE_COORDINATION]] | [[MODELS_SETTINGS]] | [[BUDGET_ALLOCATION]] | [[HUMAN_POLICY]] |
 | [[TREATMENT_ID]] | [[REVISIONS]] | [[CONFIG_DIGEST]] | [[TREATMENT_COORDINATION]] | [[MODELS_SETTINGS]] | [[BUDGET_ALLOCATION]] | [[HUMAN_POLICY]] |
 
-The planned comparison is a single coding agent, a sequential author/reviewer pair and a concurrent pair. Record the variants actually run. Match task access, tools, applicable model settings, total budgets and human policy; identify differences in instructions and communication. [[ACTUAL_CONTROLS_AND_UNAVOIDABLE_DIFFERENCES]]
+The primary comparison is a single coding agent versus the sequential author/reviewer workflow. Match task access, tool capabilities, applicable model settings, total budgets and human policy. Record instructions, role allocation and other unavoidable differences. Concurrent review, admission classifiers and context-policy ablations are deferred. [[ACTUAL_CONTROLS_AND_UNAVOIDABLE_DIFFERENCES]]
 
-Testing model-directed coordination requires an implemented baseline; an approximation is not an Anemoi reproduction. If only workflow variants are tested, limit conclusions to those variants. All baselines must preserve grader isolation and required verification. [[COORDINATION_COMPARATOR_IMPLEMENTATION_AND_SCOPE]]
+Both variants run through the same control plane and official grader. The autonomous author/reviewer variant must define its behavior on unresolved findings and review-limit exhaustion; neither means the product passed. Anemoi remains architectural prior art; this is not an Anemoi reproduction or a GAIA comparison. [[COORDINATION_COMPARATOR_IMPLEMENTATION_AND_SCOPE]]
 
 | Study | Comparison / fault condition | Repetitions per instance or fixture | Ordering / seed | Primary endpoint | Analysis population |
 | --- | --- | ---: | --- | --- | --- |
@@ -524,6 +468,6 @@ Sources accessed 8 November 2026.
 
 17. Ren, X., et al. [*Anemoi: A Semi-Centralized Multi-agent System Based on Agent-to-Agent Communication MCP server from Coral Protocol*](https://arxiv.org/html/2508.17068v3), 2025 preprint; v3, 10 October 2025.
 
-The benchmark publication inventory in Section 6.1 provides an additional 19-paper/report reading list (B01 overlaps reference 11) and the separately labeled project publication N01. Each entry links its primary source and identifies the empirical use counted.
+The [benchmark literature survey](benchmark-survey.md) retains the broader publication inventory. Those benchmarks are outside this study. SWE-bench Lite is described in its [introducing project article](https://www.swebench.com/lite.html); its evaluation uses the [official SWE-bench harness](https://github.com/SWE-bench/SWE-bench).
 
-Implementation references: [factory definition](factory.yaml), [agent library](../../agents/README.md), [review method](../../skills/critical-code-review/references/review-method.md), [execution semantics](../../../controls/docs/factory-yaml.md), [communications](../../../controls/docs/communications.md), and [operator interface](../../../controls/docs/agent-operator.md). These repository sources govern actual supported behavior.
+Implementation references: [factory definition](../python_swe_bench_lite/factory.yaml), [agent library](../../agents/README.md), [review method](../../skills/critical-code-review/references/review-method.md), [execution semantics](../../../controls/docs/factory-yaml.md), [communications](../../../controls/docs/communications.md), and [operator interface](../../../controls/docs/agent-operator.md). These repository sources govern actual supported behavior.

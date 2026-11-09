@@ -6,14 +6,13 @@ is supplied or implied by the manuscript's table/figure placeholders.
 
 ## Freeze before held-out runs
 
-- [ ] Select actual benchmark releases, revisions, splits and exact task IDs.
+- [ ] Pin the full SWE-bench Lite test split: all 300 instance IDs in the test split; no Go-only filter. Disclose development exposure.
 - [ ] Separate workflow-tuning tasks from the held-out evaluation cohorts.
-- [ ] Identify tested research questions and primary endpoints; defer optional RQs.
+- [x] Add autonomous Python baseline and coder/reviewer configurations. Existing Go factory remains unchanged.
+- [ ] Validate those configurations end to end in the isolated benchmark backend; configuration tests alone do not establish readiness.
+- [ ] Compare single-agent and sequential author/reviewer variants. Use official issue resolution as the primary endpoint; report resource use alongside it. Keep fault tests separate.
 - [ ] Register baseline and treatment definitions, package/configuration identities,
       total budgets and allocation, human policy, repetition counts and ordering.
-- [ ] Define the concrete less-constrained comparator if the central comparison
-      requires one. Otherwise narrow the research question and conclusions to
-      fixed-control-plane workflow comparisons; do not imply an unrun comparison.
 - [ ] Register uncertainty methods, analysis populations, missing-result and
       infrastructure-failure policies, and protocol-deviation handling.
 
@@ -51,7 +50,7 @@ actually used; implementation work after a run does not retroactively validate i
 - [ ] Align abstract, contributions, discussion and conclusion with actual results.
 - [ ] Replace study-plan wording with the procedure actually followed, including deviations.
 - [ ] Verify that causal claims match the comparisons and controls actually run.
-- [ ] Update reference/release information and the dated publication-use inventory.
+- [ ] Update references and exact SWE-bench Lite dataset/evaluator revisions. Keep the wider benchmark survey outside the study scope.
 - [ ] Publish permitted reproducibility materials with stable archive identifiers;
       explain licenses, unavailable artifacts and any redactions.
 - [ ] Replace local implementation links where needed for external readers.

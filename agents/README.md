@@ -44,3 +44,12 @@ Managed packages may omit Pi-specific `args`: when `-p` is absent, the Pi adapte
 Declare `runtime: {"name":"pi","version":"=1.0.3"}` in the package/agent registration in `factory.yaml`. Controls’ Pi preparer owns the private managed profile and exact native executable. These launchers reuse it, select the source workspace, preflight role tools and load linked skills; they do not copy another managed profile. Standalone startup remains independent. The bridge alone injects Factory MCP settings. See [Controls’ runtime contributor guide](../../controls/docs/runtime-adapters.md). Use package-level `overrides` for provider/model/endpoint/credential selection; see [Pi overrides](../../controls/docs/pi-overrides.md).
 
 Managed native selection is checked before launch; Pi 1.0.3 is currently supported. Native identity/capabilities are recorded separately from the command host. See [the preparation ownership diagram](../../controls/docs/images/runtime-adapters.svg). Lifecycle reports are controller-only; native delivery filters them from model input while retaining audit visibility.
+
+## Python repository repair
+
+[coder_python](coder_python/agent.md) and [code_reviewer_python](code_reviewer_python/agent.md)
+are independent bundles for focused Python issue repair. Both link to the canonical
+[Python repair skill](../skills/python-repository-repair/SKILL.md), own complete native
+profiles, and require `python3` and `rg`. They load no Go MCP or Ralph extension.
+The [Lite factory](../factories/python_swe_bench_lite/README.md) composes them into an
+autonomous review loop; the single-agent baseline uses the same coder.

@@ -100,3 +100,16 @@ With Controls, `factory_dir` defaults to `.factory` beside factory.yaml. Specs, 
 ## Native runtime integration
 
 Example Pi agent registrations explicitly select `runtime: {"name":"pi","version":"=1.0.3"}`. Controls prepares managed profiles; agent bundles retain native defaults and standalone startup. Pi supports [per-package provider/model/credential overrides](../controls/docs/pi-overrides.md) without changing bundled defaults. See [agent startup](agents/README.md#managed-native-runtime) and [adding another runner](../controls/docs/runtime-adapters.md) for ownership, capabilities and compatibility.
+
+## Benchmark integration
+
+The planned full, autonomous SWE-bench Lite study requires the work in
+[bench_issues.md](bench_issues.md). These integrations are not implemented yet.
+
+## Python SWE-bench Lite factory
+
+The [Python Lite factory](factories/python_swe_bench_lite/README.md) provides an
+autonomous coder/reviewer workflow and single-agent baseline for Python issue repair.
+Its workers have standalone launchers, native configurations and linked shared skills.
+Official environment isolation, candidate export and scoring remain integration work;
+these configurations do not replace the benchmark harness.
