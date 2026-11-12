@@ -6,6 +6,7 @@ variables:
   workspace: ${variables.worktree}/${variables.project_subdir}
 packages:
   - name: readiness
+    protocol: mcp
     path: ../../classifiers/task-readiness
     entrypoint: start.sh
     overrides:

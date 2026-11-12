@@ -159,3 +159,44 @@ test('enforced admission only admits accept at or above the configured probabili
     await assert.rejects(configuration({ admission }), /admission/);
   }
 });
+
+
+test('one readiness program uses assignment MCP without Factory files for either owner', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'readiness-assignment-'));
+  t.after(() => rm(directory,{recursive:true,force:true}));
+  let owner = 'factory';
+  let providerStatus = 200;
+  const submitted = [];
+  const http = createServer(async (req,res) => {
+    if (req.url === '/decisions') {
+      if (providerStatus !== 200) {res.writeHead(providerStatus).end();return;}
+      res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify(response()));return;
+    }
+    if (req.headers.authorization !== 'Bearer assignment-credential') {res.writeHead(401).end();return;}
+    const server = new McpServer({name:'assignment-fixture',version:'1'});
+    const respond = value => ({content:[{type:'text',text:JSON.stringify(value)}],structuredContent:value});
+    server.registerTool('assignment_get',{inputSchema:z.object({})},async () => respond({version:1,id:owner,input:{task:'Investigate gateway latency.',context:{target:'gateway'}},configuration:{endpoint:`http://127.0.0.1:${http.address().port}/decisions`,admission:{minimum_probability:0.85}}}));
+    server.registerTool('assignment_status',{inputSchema:z.object({id:z.string(),state:z.string()})},async () => respond({state:'running'}));
+    server.registerTool('assignment_complete',{inputSchema:z.object({id:z.string(),output:z.any().optional(),error:z.string().optional()})},async args => {submitted.push(args);return respond({assignment_id:args.id,state:'accepted'});});
+    const transport=new StreamableHTTPServerTransport({sessionIdGenerator:undefined});
+    await server.connect(transport);res.on('close',()=>{transport.close();server.close();});
+    await transport.handleRequest(req,res);
+  });
+  await new Promise(resolve => http.listen(0,'127.0.0.1',resolve));
+  t.after(()=>{http.closeAllConnections();http.close();});
+  async function run() {
+    const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!key.startsWith('FACTORY_') && !key.startsWith('FABRIC_') && !key.startsWith('AGENT_MCP_')));
+    Object.assign(env,{AGENT_MCP_URL:`http://127.0.0.1:${http.address().port}/mcp`,AGENT_MCP_TOKEN:'assignment-credential',OPENROUTER_API_KEY:'fixture-secret'});
+    const child=spawn(fileURLToPath(new URL('../classifiers/task-readiness/start.sh',import.meta.url)),[],{cwd:directory,env,stdio:['ignore','pipe','pipe']});
+    let output='';child.stdout.on('data',v=>output+=v);child.stderr.on('data',v=>output+=v);
+    const code=await new Promise((resolve,reject)=>{child.on('error',reject);child.on('close',resolve);});
+    assert.ok(!output.includes('fixture-secret'));
+    return {code,output};
+  }
+  for (const mode of ['factory','fabric']) {
+    owner=mode;const result=await run();assert.equal(result.code,0,result.output);
+    assert.equal(submitted.at(-1).id,mode);assert.equal(submitted.at(-1).output.outcome,'review_required');
+    assert.deepEqual(submitted.at(-1).output.data.response,response());
+  }
+  providerStatus=401;const failed=await run();assert.equal(failed.code,1);assert.match(submitted.at(-1).error,/HTTP 401/);
+});

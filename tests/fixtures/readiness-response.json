@@ -1,0 +1,31 @@
+{
+  "model": "readiness-fixture",
+  "provider": "TypeSafe",
+  "answers": {
+    "task_type": {
+      "type": "choice",
+      "choice": "investigation",
+      "probabilities": {
+        "investigation": 0.95,
+        "implementation": 0.02,
+        "follow_up": 0.01,
+        "other": 0.02
+      },
+      "confidence": 0.93
+    },
+    "readiness": {
+      "type": "choice",
+      "choice": "clarify",
+      "probabilities": {
+        "accept": 0.12,
+        "clarify": 0.85,
+        "pass_through": 0.03
+      },
+      "confidence": 0.76
+    },
+    "missing_target": {
+      "type": "noul",
+      "noul": 0.91
+    }
+  }
+}

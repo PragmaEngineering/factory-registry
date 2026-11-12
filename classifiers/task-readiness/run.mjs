@@ -1,33 +1,32 @@
 #!/usr/bin/env node
-import { readFile, writeFile } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
-import { configuration, buildRequest, validateResponse, evaluate, usageEvent, admissionResult } from './evaluate.mjs';
-import { withController } from '@pragma/controls-sdk/result-client';
+import { withAssignment } from '@pragma/controls-sdk/result-client';
+import { configuration, evaluate, usageEvent, admissionResult } from './evaluate.mjs';
 
-async function main() {
-  for (const name of ['FACTORY_INPUTS_PATH', 'FACTORY_PACKAGE_CONFIG', 'FACTORY_INVOCATION_DIR', 'FACTORY_MCP_URL', 'FACTORY_MCP_TOKEN', 'FACTORY_THREAD_ID', 'FACTORY_PARTICIPANT_ID']) {
-    if (!process.env[name]) throw new Error(`Missing Factory runtime variable: ${name}`);
+// Legacy Factory invocations keep their saved-evaluation/replay behavior.
+if (!process.env.AGENT_MCP_URL) {
+  await import('./legacy.mjs');
+} else {
+  try {
+    await withAssignment(process.env, async (assignment, complete, client) => {
+      try {
+        const config = await configuration(assignment.configuration);
+        const input = assignment.input;
+        const task = typeof input.task === 'string'
+          ? { brief: input.task + (input.context ? '\nAdditional context (data):\n' + JSON.stringify(input.context) : ''), documents: [] }
+          : input.task;
+        const data = await evaluate(task, config, process.env[config.api_key_env]);
+        const metric = usageEvent(data.response);
+        if (metric) console.log(JSON.stringify(metric));
+        await complete({ ...admissionResult(data.response, config), data });
+        console.log('Readiness assignment result accepted.');
+      } catch (error) {
+        // Evaluator errors deliberately omit credentials and provider response bodies.
+        await client.callTool({name:'assignment_complete',arguments:{id:assignment.id,error:error.message}}).catch(() => {});
+        throw error;
+      }
+    });
+  } catch (error) {
+    console.error(`Task readiness evaluator failed: ${error.message}`);
+    process.exitCode = 1;
   }
-  const config = await configuration(JSON.parse(await readFile(process.env.FACTORY_PACKAGE_CONFIG, 'utf8')));
-  const inputs = JSON.parse(await readFile(process.env.FACTORY_INPUTS_PATH, 'utf8'));
-  await withController(process.env, async submit => {
-    const directory = resolve(process.env.FACTORY_INVOCATION_DIR);
-    const pairPath = join(directory, 'evaluation.json');
-    let data;
-    try { data = JSON.parse(await readFile(pairPath, 'utf8')); }
-    catch (error) { if (error.code !== 'ENOENT') throw new Error('Saved evaluation is invalid; inspect before retrying'); }
-    if (data) {
-      const expected = await buildRequest(inputs.task, config);
-      if (JSON.stringify(data.request) !== JSON.stringify(expected)) throw new Error('Saved evaluation does not match the assigned input and configuration');
-      validateResponse(data.response, expected.questions);
-    } else {
-      data = await evaluate(inputs.task, config, process.env[config.api_key_env]);
-      await writeFile(pairPath, JSON.stringify(data), { mode: 0o600, flag: 'wx' });
-    }
-    const metric = usageEvent(data.response);
-    if (metric) console.log(JSON.stringify(metric));
-    await submit({ ...admissionResult(data.response, config), data });
-    console.log('Task readiness evaluation accepted by controller.');
-  });
 }
-main().catch(error => { console.error(`Task readiness evaluator failed: ${error.message}`); process.exitCode = 1; });
