@@ -1,6 +1,6 @@
 # Benchmark literature survey
 
-Background reading, not the evaluation plan for the paper. The first study focuses on SWE-bench Multilingual. Other integrations are deferred. Counts below are a dated, bounded inventory, not current worldwide adoption totals.
+Background reading, not the evaluation plan for the paper. The [paper](whitepaper.md) focuses on SWE-bench Lite. Other integrations are deferred. Counts below are a dated, bounded inventory, not current worldwide adoption totals.
 
 #### Publication-count method
 

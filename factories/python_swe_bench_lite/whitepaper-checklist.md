@@ -6,9 +6,9 @@ is supplied or implied by the manuscript's table/figure placeholders.
 
 ## Freeze before held-out runs
 
-- [ ] Pin the full SWE-bench Lite test split: all 300 instance IDs in the test split; no Go-only filter. Disclose development exposure.
+- [ ] Pin the full SWE-bench Lite test split: all 300 instance IDs in the test split. Disclose development exposure.
 - [ ] Separate workflow-tuning tasks from the held-out evaluation cohorts.
-- [x] Add autonomous Python baseline and coder/reviewer configurations. Existing Go factory remains unchanged.
+- [x] Add autonomous Python baseline and coder/reviewer configurations.
 - [ ] Validate those configurations end to end in the isolated benchmark backend; configuration tests alone do not establish readiness.
 - [ ] Compare single-agent and sequential author/reviewer variants. Use official issue resolution as the primary endpoint; report resource use alongside it. Keep fault tests separate.
 - [ ] Register baseline and treatment definitions, package/configuration identities,

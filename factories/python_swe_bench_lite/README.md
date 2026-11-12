@@ -13,6 +13,13 @@ readiness classifier, Git hooks or Ralph loops. Review-limit exhaustion fails th
 execution under current Controls semantics; it is not approval. The candidate remains
 subject to independent grading once export/grading integration exists.
 
+## Research paper
+
+The [white paper](whitepaper.md) describes the control plane and these Python
+workflows, with a planned SWE-bench Lite comparison. Benchmark results are pending;
+see the [publication checklist](whitepaper-checklist.md). The wider
+[benchmark literature survey](benchmark-survey.md) is background, not the study scope.
+
 ## Agent configuration
 
 [coder_python](../../agents/coder_python/agent.md) and

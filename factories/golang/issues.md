@@ -88,7 +88,7 @@ The cancellation example follows the Go API contract: contexts carry cancellatio
 
 ### References
 
-- [Factory white paper](whitepaper.md): current architecture, implementation status, measurement boundaries, and source bibliography.
+- [Factory white paper](../python_swe_bench_lite/whitepaper.md): current architecture, implementation status, measurement boundaries, and source bibliography.
 - [Google: The Standard of Code Review](https://google.github.io/eng-practices/review/reviewer/standard.html): evidence and engineering judgment over personal preference; improving code health without demanding perfection.
 - [Anthropic: Building effective agents](https://www.anthropic.com/research/building-effective-agents): evaluator–optimizer loops require useful evaluation criteria and bounded iteration.
 - [Go: Data Race Detector](https://go.dev/doc/articles/race_detector): findings depend on code paths actually exercised.

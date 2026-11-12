@@ -1,6 +1,6 @@
 # Pragma: A Control Plane and Configured Workflow for Agentic Software Engineering
 
-Empirical systems manuscript — internal draft, 8 November 2026.
+Empirical systems manuscript — internal draft, updated 9 November 2026.
 
 **Authoring note:** `[[...]]` marks evidence or analysis to insert after the benchmark studies. This manuscript is not for publication until those fields are resolved. See the separate [publication checklist](whitepaper-checklist.md); the authoring note is removed from the submission version.
 
@@ -143,7 +143,7 @@ The evaluator uses the public interface rather than launching or repairing worke
 
 The CLI/MCP client submits a configuration and captured input to a shared service. The control plane pins the execution definition, establishes invocation identities and records steps, visits, attempts, sessions, decisions and events. A Go engine interface separates the control plane from the current Hatchet scheduler; Factory-owned PostgreSQL records retain control-plane state alongside the engine's own tables. The CLI is a client, not the workflow executor. ([Control-plane overview](../../../controls/README.md); [engine integration](../../../controls/docs/hatchet-engine.md))
 
-The scheduler follows configured routes, loops and human checkpoints. Sequential loops run members in order. Concurrent loops start all members, share a communication thread and require compatible exit routes. A round ends when every member has an accepted result. The reference Go workflow is sequential. ([Loop semantics](../../../controls/docs/factory-yaml.md#loop-execution-mode))
+The scheduler follows configured routes, loops and human checkpoints. Sequential loops run members in order. Concurrent loops start all members, share a communication thread and require compatible exit routes. A round ends when every member has an accepted result. The Python author/reviewer workflow uses sequential mode. ([Loop semantics](../../../controls/docs/factory-yaml.md#loop-execution-mode))
 
 Persistent state does not imply process recovery: the local service cannot reattach interrupted agent sessions after restart. Operators must inspect the execution before retrying. Review-loop limits also do not govern infrastructure retries. ([Service lifecycle](../../../controls/README.md); [configuration and retry limits](../../../controls/docs/factory-yaml.md))
 
@@ -186,10 +186,10 @@ A planned check, an agent's claim, a retained tool result and an independent rev
 
 ## 5. Part II — The Python Issue-Repair Workflow
 
-The [Python factory](../python_swe_bench_lite/README.md) targets existing-repository
+The [Python factory](README.md) targets existing-repository
 bug fixes. It uses the supplied issue and source baseline directly, without requiring
 separate specification or plan documents. Its two configurations define the study
-variants; the older human-reviewed Go workflow is not the benchmark treatment.
+variants: a single coding agent and a sequential coder/reviewer pair.
 
 ```mermaid
 flowchart TD
@@ -256,7 +256,7 @@ available. Local workflow state and official correctness remain separate measure
 
 ### 5.3 Configuration and integration status
 
-The [factory and baseline](../python_swe_bench_lite/README.md) and Python worker bundles
+The [factory and baseline](README.md) and Python worker bundles
 are implemented. The current host runner does not provide benchmark isolation,
 instance provisioning, public patch export or official grading. Those integrations
 are recorded in [Registry](../../bench_issues.md), [Controls](../../../controls/bench_issues.md)
@@ -452,22 +452,17 @@ Sources accessed 8 November 2026.
 1. [Anthropic — Building effective agents](https://www.anthropic.com/research/building-effective-agents), 19 December 2024.
 2. [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents), 29 September 2025.
 3. [Google Engineering Practices — The Standard of Code Review](https://google.github.io/eng-practices/review/reviewer/standard.html).
-4. [Go project — Data Race Detector](https://go.dev/doc/articles/race_detector).
-5. [Go project — Getting started with fuzzing](https://go.dev/doc/tutorial/fuzz).
-6. [Anthropic — Demystifying evals for AI agents](https://www.anthropic.com/research/demystifying-evals-for-ai-agents), 9 January 2026.
-7. Olausson, T. X., Inala, J. P., Wang, C., Gao, J., and Solar-Lezama, A. [*Is Self-Repair a Silver Bullet for Code Generation?*](https://arxiv.org/abs/2306.09896v5), ICLR 2024; arXiv v5, 2 February 2024.
-8. Shinn, N., Cassano, F., Berman, E., Gopinath, A., Narasimhan, K., and Yao, S. [*Reflexion: Language Agents with Verbal Reinforcement Learning*](https://arxiv.org/abs/2303.11366v4), NeurIPS 2023.
-9. Cemri, M., et al. [*Why Do Multi-Agent LLM Systems Fail?*](https://arxiv.org/abs/2503.13657v3), 2025 preprint; v3, 26 October 2025.
-10. Liu, N. F., et al. [*Lost in the Middle: How Language Models Use Long Contexts*](https://aclanthology.org/2024.tacl-1.9/), Transactions of the Association for Computational Linguistics 12 (2024), 157–173. [DOI: 10.1162/tacl_a_00638](https://doi.org/10.1162/tacl_a_00638).
-11. Jimenez, C. E., et al. [*SWE-bench: Can Language Models Resolve Real-World GitHub Issues?*](https://arxiv.org/abs/2310.06770), ICLR 2024.
-12. Becker, J., Rush, N., Barnes, E., and Rein, D. [*Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity*](https://arxiv.org/abs/2507.09089), 2025. [METR methodology and discussion](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/).
-13. METR. [*We are Changing our Developer Productivity Experiment Design*](https://metr.org/blog/2026-02-24-uplift-update/), 24 February 2026.
-14. Bender, A. [*Testing Overview*](https://abseil.io/resources/swe-book/html/ch11.html), chapter 11 of *Software Engineering at Google*, 2020.
-15. Git project. [*git-worktree* reference](https://git-scm.com/docs/git-worktree).
-16. Go project. [*context* package overview](https://pkg.go.dev/context#pkg-overview).
+4. [Anthropic — Demystifying evals for AI agents](https://www.anthropic.com/research/demystifying-evals-for-ai-agents), 9 January 2026.
+5. Olausson, T. X., Inala, J. P., Wang, C., Gao, J., and Solar-Lezama, A. [*Is Self-Repair a Silver Bullet for Code Generation?*](https://arxiv.org/abs/2306.09896v5), ICLR 2024; arXiv v5, 2 February 2024.
+6. Shinn, N., Cassano, F., Berman, E., Gopinath, A., Narasimhan, K., and Yao, S. [*Reflexion: Language Agents with Verbal Reinforcement Learning*](https://arxiv.org/abs/2303.11366v4), NeurIPS 2023.
+7. Cemri, M., et al. [*Why Do Multi-Agent LLM Systems Fail?*](https://arxiv.org/abs/2503.13657v3), 2025 preprint; v3, 26 October 2025.
+8. Liu, N. F., et al. [*Lost in the Middle: How Language Models Use Long Contexts*](https://aclanthology.org/2024.tacl-1.9/), Transactions of the Association for Computational Linguistics 12 (2024), 157–173. [DOI: 10.1162/tacl_a_00638](https://doi.org/10.1162/tacl_a_00638).
+9. Jimenez, C. E., et al. [*SWE-bench: Can Language Models Resolve Real-World GitHub Issues?*](https://arxiv.org/abs/2310.06770), ICLR 2024.
+10. Becker, J., Rush, N., Barnes, E., and Rein, D. [*Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity*](https://arxiv.org/abs/2507.09089), 2025. [METR methodology and discussion](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/).
+11. METR. [*We are Changing our Developer Productivity Experiment Design*](https://metr.org/blog/2026-02-24-uplift-update/), 24 February 2026.
 
-17. Ren, X., et al. [*Anemoi: A Semi-Centralized Multi-agent System Based on Agent-to-Agent Communication MCP server from Coral Protocol*](https://arxiv.org/html/2508.17068v3), 2025 preprint; v3, 10 October 2025.
+12. Ren, X., et al. [*Anemoi: A Semi-Centralized Multi-agent System Based on Agent-to-Agent Communication MCP server from Coral Protocol*](https://arxiv.org/html/2508.17068v3), 2025 preprint; v3, 10 October 2025.
 
 The [benchmark literature survey](benchmark-survey.md) retains the broader publication inventory. Those benchmarks are outside this study. SWE-bench Lite is described in its [introducing project article](https://www.swebench.com/lite.html); its evaluation uses the [official SWE-bench harness](https://github.com/SWE-bench/SWE-bench).
 
-Implementation references: [factory definition](../python_swe_bench_lite/factory.yaml), [agent library](../../agents/README.md), [review method](../../skills/critical-code-review/references/review-method.md), [execution semantics](../../../controls/docs/factory-yaml.md), [communications](../../../controls/docs/communications.md), and [operator interface](../../../controls/docs/agent-operator.md). These repository sources govern actual supported behavior.
+Implementation references: [factory definition](factory.yaml), [agent library](../../agents/README.md), [review method](../../skills/critical-code-review/references/review-method.md), [execution semantics](../../../controls/docs/factory-yaml.md), [communications](../../../controls/docs/communications.md), and [operator interface](../../../controls/docs/agent-operator.md). These repository sources govern actual supported behavior.
