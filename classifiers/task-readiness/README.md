@@ -11,7 +11,8 @@ A small Jev classification package for new-task admission. It asks whether a tas
 | `config.json` | Model/provider defaults, credential environment name, endpoint, timeout and byte limits. |
 | `questions.json` | Versioned task-type, readiness and missing-target questions. |
 | `evaluate.mjs` | Input construction, captured-document digest checks, bounded provider call and answer validation. |
-| `run.mjs` / `start.sh` | Factory entrypoint: reads bound inputs/settings, connects MCP, saves the evaluation and submits its result. |
+| `run.mjs` / `start.sh` | Shared assignment MCP entrypoint: fetches input/settings, evaluates, and completes through the API. |
+| `legacy.mjs` | Compatibility adapter for legacy Factory variables/files and saved-evaluation replay. |
 
 Use a copy of this bundle for a different rubric or question set. Factory pins the bundle digest and effective `overrides` settings. Changes after an execution starts invalidate its package hash.
 
@@ -23,6 +24,7 @@ Defaults use OpenRouter's Decisions endpoint and `typesafe/jev-1.14`. Only the O
 name: readiness
 path: /path/to/registry/classifiers/task-readiness
 entrypoint: start.sh
+protocol: mcp
 overrides:
   provider: openrouter
   endpoint: https://openrouter.ai/api/alpha/decisions
@@ -32,7 +34,7 @@ overrides:
     minimum_probability: 0.85
 ```
 
-The credential value must exist in the **Factory service's environment**, not just a later client terminal. `overrides` contains its variable name, never the secret. Native model/provider configuration for the downstream planning agent is independent of this classifier's configuration.
+The credential value must exist in the **Controls execution service's environment**, not just a later client terminal. `overrides` contains its variable name, never the secret. Native model/provider configuration for the downstream planning agent is independent of this classifier's configuration.
 
 Requires Node.js 22+ and the Controls SDK dependency, installed through Registry. The Go binary installer does not install these npm dependencies. With sibling Controls and Registry checkouts:
 
@@ -43,7 +45,10 @@ npm ci --prefix /path/to/registry
 
 ## Inputs and outputs
 
-Bind `task` to `{"execution":"input"}`. It contains `brief` and captured document metadata. The classifier loads document bytes from their absolute local paths, checks their captured SHA-256 digests, and decodes UTF-8 before sending the request. It does not scan the repository or invent a context summary. The bundle sets `task_phase: new_task`; it is intended for the start of an execution, not repeated classification of inbox follow-ups.
+In Factory, bind `task` to `{"execution":"input"}`; it contains `brief` and
+captured document metadata. Fabric also accepts a `task` string and optional
+`context` object, normalized into the same evaluator request. Inputs/settings are
+retrieved through `assignment_get`, not generated assignment files. The classifier loads document bytes from their absolute local paths, checks their captured SHA-256 digests, and decodes UTF-8 before sending the request. It does not scan the repository or invent a context summary. The bundle sets `task_phase: new_task`; it is intended for the start of an execution, not repeated classification of inbox follow-ups.
 
 Its accepted result has:
 
@@ -58,7 +63,10 @@ Its accepted result has:
 }
 ```
 
-The shown bodies are abbreviated, not actual predictions. Runtime data retains every returned body field, including answer probabilities, model metadata and usage. Bodies are preserved as JSON values, not original whitespace or HTTP bytes. Headers and credentials are excluded. The result is sent to the discovered controller participant using MCP and must receive `effect.state: accepted`.
+The shown bodies are abbreviated, not actual predictions. Runtime data retains every returned body field, including answer probabilities, model metadata and usage. Bodies are preserved as JSON values, not original whitespace or HTTP bytes. Headers and credentials are excluded. The program submits this object through `assignment_complete` and waits for
+`state: accepted`. Factory interprets the outcome using its configured routes;
+Fabric returns the assessment as a completed capability result. The program does
+not discover a controller or select an owner-specific completion payload.
 
 Bind later step inputs to outputs named `request` and `response`. The original bodies remain unchanged in either mode; no feedback envelope or prose template is added. See the [complete factory example](../../factories/golang/factory.yaml).
 
@@ -81,7 +89,9 @@ Omit `admission`, or set it to `null`, for advisory `completed` behavior. The wo
 
 - Default provider timeout: 20 seconds; configurable up to 120 seconds. No hidden provider retry. Factory retry uses a new attempt.
 - Request and response bodies are each capped at 24,000 UTF-8 bytes; settings may lower these limits. These bounds keep the pair within the current 64 KiB MCP message contract. Oversized tasks fail visibly, **never truncate**. Large-document support would need a separate artifact-reference transport.
-- `evaluation.json` is saved under the private invocation directory, outside the project. A restarted process in the same invocation can resubmit that pair without another provider call; mismatching or partial saved data blocks recovery. A crash before the saved pair exists may still require another billed request.
+- In explicit legacy mode only, `evaluation.json` is saved under the private invocation directory, outside the project. A restarted process in the same invocation can resubmit that pair without another provider call; mismatching or partial saved data blocks recovery. A crash before the saved pair exists may still require another billed request.
+  The MCP completion API supports durable unchanged retries without that file cache;
+  it does not automatically repeat a provider request after an uncertain launch.
 - Structured provider usage produces one runner-neutral telemetry event; unavailable usage stays unknown. Request/response bodies are not printed to stdout.
 - Current packages execute with host-user permissions; this bundle does not provide a sandbox.
 

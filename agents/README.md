@@ -16,7 +16,10 @@ The shared [preflight script](scripts/preflight.mjs) belongs to the Registry lau
 
 ## Factory runtime integration
 
-When [Factory Workflows](../../controls/README.md) starts an agent, it supplies the private MCP connection and injects the shared communication skill. The [Pi adapter](../../controls/adapters/pi/pi-rpc-session.mjs) configures the native connection, delivers thread messages, streams native output, and keeps the session available between turns. Agents use `send_message` for progress, input requests, and final results. Factory verifies configured output files according to `outputs_on`; the model does not compute their digests.
+With `protocol: mcp`, [Factory Workflows](../../controls/README.md) supplies a
+scoped MCP connection and the adapter retrieves the assignment through the shared
+API. Legacy mode additionally provisions its historical communication skill. The [Pi adapter](../../controls/adapters/pi/pi-rpc-session.mjs) configures the native connection, delivers thread messages, streams native output, and keeps the session available between turns. MCP-mode agents use `assignment_complete` for final output/error and the
+conversation tools for peer messages. Legacy agents retain `step_result` messages. Factory verifies configured output files according to `outputs_on`; the model does not compute their digests.
 
 See [runtime setup and the runner contract](../../controls/adapters/README.md) and [Registry dependency installation](../README.md#controls-dependencies). The Go binary installer does not install these Node.js dependencies. Standalone entrypoints retain normal Pi behavior. The host runner is not a sandbox. The writing factory example still requires adaptation to the current configuration schema, although the pair writer now supports the same managed runtime adapter.
 
@@ -37,7 +40,8 @@ Conventional commits and Linear context remain optional library skills. Link the
 
 Both design agents include the on-demand [Go planning evidence skill](../skills/go-planning-evidence/SKILL.md). Other languages keep the generic planning method. Author skills render content-only HTML bodies with the shared document helper; review skills use the same helper to read content without CSS.
 
-Managed packages may omit Pi-specific `args`: when `-p` is absent, the Pi adapter reads the assignment from `FACTORY_PROMPT_PATH`. That assignment includes explicitly bound structured inputs. This does not change standalone `start.sh -p "..."` usage or native provider/model configuration.
+Managed packages may omit Pi-specific `args`: MCP mode retrieves the assignment through the API. Legacy mode reads
+`FACTORY_PROMPT_PATH` when `-p` is absent. That assignment includes explicitly bound structured inputs. This does not change standalone `start.sh -p "..."` usage or native provider/model configuration.
 
 ## Managed native runtime
 
