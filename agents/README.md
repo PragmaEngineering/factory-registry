@@ -53,3 +53,14 @@ are independent bundles for focused Python issue repair. Both link to the canoni
 profiles, and require `python3` and `rg`. They load no Go MCP or Ralph extension.
 The [Lite factory](../factories/python_swe_bench_lite/README.md) composes them into an
 autonomous review loop; the single-agent baseline uses the same coder.
+
+## Shared assignment MCP
+
+The Go factory now declares `protocol: mcp` for readiness and its four Pi roles.
+Programs bootstrap only their authenticated MCP connection; assignments are read
+through `assignment_get`, lifecycle is reported through `assignment_status`, and
+results/errors use `assignment_complete`. Factory and Fabric use the same agent
+contract. Controls still owns native Pi preparation from YAML runtime/provider
+settings. The Go roles keep their own instructions and linked skills. Legacy
+Factory variables and saved readiness evaluations remain `protocol: legacy`
+compatibility, not prerequisites for these MCP-mode packages.

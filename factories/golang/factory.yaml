@@ -20,13 +20,12 @@ packages:
       admission:
         minimum_probability: 0.85
   - name: architect
+    protocol: mcp
     path: ../../agents/architect
     entrypoint: start.sh
     args:
       - --workspace
       - ${variables.workspace}
-      - -p
-      - '{prompt}'
     runtime:
       name: pi
       version: =1.0.3
@@ -50,13 +49,12 @@ packages:
           cache_read: 0
           cache_write: 0
   - name: architecture_reviewer
+    protocol: mcp
     path: ../../agents/architecture_reviewer
     entrypoint: start.sh
     args:
       - --workspace
       - ${variables.workspace}
-      - -p
-      - '{prompt}'
     runtime:
       name: pi
       version: =1.0.3
@@ -80,13 +78,12 @@ packages:
           cache_read: 0
           cache_write: 0
   - name: coder_golang
+    protocol: mcp
     path: ../../agents/coder_golang
     entrypoint: start.sh
     args:
       - --workspace
       - ${variables.workspace}
-      - -p
-      - '{prompt}'
     runtime:
       name: pi
       version: =1.0.3
@@ -110,13 +107,12 @@ packages:
           cache_read: 0
           cache_write: 0
   - name: code_reviewer_golang
+    protocol: mcp
     path: ../../agents/code_reviewer_golang
     entrypoint: start.sh
     args:
       - --workspace
       - ${variables.workspace}
-      - -p
-      - '{prompt}'
     runtime:
       name: pi
       version: =1.0.3

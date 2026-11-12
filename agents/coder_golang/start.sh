@@ -21,11 +21,11 @@ if [ -n "${AGENT_INSTRUCTIONS_FILE:-}" ]; then
   else
     node "$agent_dir/../scripts/preflight.mjs" --agent "${AGENT_EXECUTABLE:-pi}" --require rg --require go --require gofmt --require golangci-lint
   fi
-  if [ -n "${FACTORY_MCP_URL:-}" ]; then exec node "$agent_dir/../../node_modules/@pragma/adapter-pi/pi-rpc-session.mjs" --append-system-prompt "$AGENT_INSTRUCTIONS_FILE" "$@"; fi
+  if [ -n "${AGENT_MCP_URL:-}${FACTORY_MCP_URL:-}" ]; then exec node "$agent_dir/../../node_modules/@pragma/adapter-pi/pi-rpc-session.mjs" --append-system-prompt "$AGENT_INSTRUCTIONS_FILE" "$@"; fi
   exec "${AGENT_EXECUTABLE:-pi}" --append-system-prompt "$AGENT_INSTRUCTIONS_FILE" "$@"
 fi
 # Standalone sessions use this bundle's Pi profile and linked skills.
-if [ "${FACTORY_RUNTIME_NAME:-}" = "pi" ]; then
+if [ "${AGENT_RUNTIME_NAME:-${FACTORY_RUNTIME_NAME:-}}" = "pi" ]; then
   # Controls' Pi preparer owns the private managed profile and executable.
   profile=${PI_CODING_AGENT_DIR:?Managed Pi profile is required}
 else
@@ -43,5 +43,5 @@ for skill in "$agent_dir"/skills/*; do
   skill_dir=$(CDPATH= cd -- "$skill" && pwd -P)
   set -- --skill "$skill_dir" "$@"
 done
-if [ -n "${FACTORY_MCP_URL:-}" ]; then exec node "$agent_dir/../../node_modules/@pragma/adapter-pi/pi-rpc-session.mjs" "$@"; fi
+if [ -n "${AGENT_MCP_URL:-}${FACTORY_MCP_URL:-}" ]; then exec node "$agent_dir/../../node_modules/@pragma/adapter-pi/pi-rpc-session.mjs" "$@"; fi
 exec "${AGENT_EXECUTABLE:-pi}" "$@"
