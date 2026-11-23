@@ -28,7 +28,7 @@ packages:
       - ${variables.workspace}
     runtime:
       name: pi
-      version: =1.0.3
+      version: ">=1.0.0 <2.0.0"
     overrides:
       provider: openrouter
       model: deepseek/deepseek-v4-flash
@@ -57,7 +57,7 @@ packages:
       - ${variables.workspace}
     runtime:
       name: pi
-      version: =1.0.3
+      version: ">=1.0.0 <2.0.0"
     overrides:
       provider: openrouter
       model: deepseek/deepseek-v4-flash
@@ -86,7 +86,7 @@ packages:
       - ${variables.workspace}
     runtime:
       name: pi
-      version: =1.0.3
+      version: ">=1.0.0 <2.0.0"
     overrides:
       provider: openrouter
       model: deepseek/deepseek-v4-flash
@@ -115,7 +115,7 @@ packages:
       - ${variables.workspace}
     runtime:
       name: pi
-      version: =1.0.3
+      version: ">=1.0.0 <2.0.0"
     overrides:
       provider: openrouter
       model: deepseek/deepseek-v4-flash

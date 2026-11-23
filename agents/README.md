@@ -45,9 +45,9 @@ Managed packages may omit Pi-specific `args`: MCP mode retrieves the assignment 
 
 ## Managed native runtime
 
-Declare `runtime: {"name":"pi","version":"=1.0.3"}` in the package/agent registration in `factory.yaml`. Controls’ Pi preparer owns the private managed profile and exact native executable. These launchers reuse it, select the source workspace, preflight role tools and load linked skills; they do not copy another managed profile. Standalone startup remains independent. The bridge alone injects Factory MCP settings. See [Controls’ runtime contributor guide](../../controls/docs/runtime-adapters.md). Use package-level `overrides` for provider/model/endpoint/credential selection; see [Pi overrides](../../controls/docs/pi-overrides.md).
+Declare `runtime: {"name":"pi","version":">=1.0.0 <2.0.0"}` in the package/agent registration in `factory.yaml`. Controls’ Pi preparer owns the private managed profile and exact native executable. These launchers reuse it, select the source workspace, preflight role tools and load linked skills; they do not copy another managed profile. Standalone startup remains independent. The bridge alone injects Factory MCP settings. See [Controls’ runtime contributor guide](../../controls/docs/runtime-adapters.md). Use package-level `overrides` for provider/model/endpoint/credential selection; see [Pi overrides](../../controls/docs/pi-overrides.md).
 
-Managed native selection is checked before launch; Pi 1.0.3 is currently supported. Native identity/capabilities are recorded separately from the command host. See [the preparation ownership diagram](../../controls/docs/images/runtime-adapters.svg). Lifecycle reports are controller-only; native delivery filters them from model input while retaining audit visibility.
+Managed native selection is checked before launch; stable Pi 1.x is supported; other major versions and prereleases are rejected. Native identity/capabilities are recorded separately from the command host. See [the preparation ownership diagram](../../controls/docs/images/runtime-adapters.svg). Lifecycle reports are controller-only; native delivery filters them from model input while retaining audit visibility.
 
 ## Python repository repair
 
